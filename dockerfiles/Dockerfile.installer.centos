@@ -1,0 +1,22 @@
+FROM centos:7
+MAINTAINER Billy Holmes <billy@gonoph.net>
+RUN     yum update -y \
+	&& yum install -y epel-release centos-release-openshift-origin36.noarch \
+	&& rm -rf /var/cache/yum
+ENV	PS1='\[\033[01;30m\](\[\033[01;32m\]container\[\033[01;30m\])\[\033[0m\] [\u@\h \[\033[01;34m\]\W\[\033[0m\]]$ ' \
+	TERM=linux
+RUN	yum install -y \
+	sudo \
+        atomic-openshift-utils \
+        openssh-clients \
+        vim \
+        python-boto \
+        && yum -y install python2-pip \
+        && rm -rf /var/cache/yum \
+        && pip install boto3 \
+        && rm /root/.cache/pip/ -rf \
+        && groupadd -g 1000 ansible \
+        && useradd -u 1000 -g 1000 ansible -G wheel \
+        && echo 'ansible  ALL=(ALL)       NOPASSWD: ALL' > /etc/sudoers.d/ansible_conf
+USER    ansible
+CMD [ "/usr/bin/bash" ]
