@@ -1,0 +1,10 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    # delay: 10
+    timeout: 320
+    state: started

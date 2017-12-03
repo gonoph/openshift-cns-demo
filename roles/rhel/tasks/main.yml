@@ -1,0 +1,19 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- include_tasks: root_login.yml
+  tags: [ rhel, rhel_root ]
+
+- include_tasks: dns.yml
+  tags: [ rhel, rhel_dns ]
+
+- include_tasks: subscription.yml
+  tags: [ rhel, rhel_subscription ]
+
+- include_tasks: services.yml
+  tags: [ rhel, rhel_services ]
+
+- include_tasks: storage.yml
+  tags: [ rhel, rhel_storage ]
+
+- meta: flush_handlers

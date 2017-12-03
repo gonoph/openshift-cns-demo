@@ -1,0 +1,45 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: read in secret vars
+  any_errors_fatal: true
+  hosts: all
+  gather_facts: false
+  connection: local
+  tags: [ always ]
+  tasks: 
+  - include_vars: secret.yml
+    run_once: true
+
+- name: Create EC2 instances
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: ec2
+  gather_facts: false
+  connection: local
+  tags: ec2
+  vars:
+    ec2_create: true
+  roles:
+    - ec2
+
+- name: add instances to ssh config
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: OSEv3
+  gather_facts: false
+  connection: local
+  tags: [ always ]
+  tasks:
+    - name: adding to ssh config
+      run_once: true
+      blockinfile:
+        marker: "# {mark} OCP-DEMO MANAGED BLOCK"
+        path: ~/.ssh/config
+        block: |
+          {% for hn in play_hosts %}
+          {% if hostvars[hn].public_ip | default('') | length > 0 %}
+          Host {{ hn }} {{ hn.split('.') | first }}
+            Hostname {{ hostvars[hn].public_ip }}
+            User {{ ansible_user }}
+          {% endif %}
+          {% endfor %}

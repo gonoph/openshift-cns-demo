@@ -1,0 +1,4 @@
+resolv-file=/etc/dnsmasq.resolv
+address=/.{{ openshift_master_default_subdomain }}/{{ internal_ip }}
+# Include all files in /etc/dnsmasq.d except RPM backup files
+conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig

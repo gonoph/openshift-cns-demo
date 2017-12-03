@@ -1,0 +1,18 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: ensure hostname is set correctly
+  command: "/usr/bin/hostnamectl set-hostname {{ inventory_hostname }}"
+  when: ansible_fqdn != inventory_hostname
+
+- name: gather facts with new hostname
+  when: ansible_fqdn != inventory_hostname
+  setup:
+
+- name: register system
+  redhat_subscription:
+    state: present
+    org_id: "{{ subscription_org }}"
+    activationkey: "{{ subscription_ak }}"
+  notify:
+    - disable all repos
+    - enable repos

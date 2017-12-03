@@ -1,0 +1,72 @@
+#---
+# vim: sw=4 ai expandtab
+global
+    log         /dev/log	local0
+
+    chroot      /tmp
+    pidfile     /haproxy.pid
+    maxconn     4000
+    user        daemon
+    group       daemon
+    daemon
+    tune.ssl.default-dh-param 2048
+
+    # turn on stats unix socket
+    stats socket /tmp/stats
+
+defaults
+    log                     global
+    option                  redispatch
+    option                  dontlognull
+    retries                 3
+    timeout http-request    60s
+    timeout queue           2m
+    timeout connect         10s
+    timeout client          2m
+    timeout server          2m
+    timeout http-keep-alive 60s
+    timeout check           20s
+    maxconn                 1000
+    option log-health-checks
+
+listen lb_ocp
+    bind		*:8443
+    mode                tcp
+    option              tcplog
+    option              tcp-check
+    # option              ssl-hello-chk
+
+    balance source
+{% for hn in groups.masters %}
+{% if 'internal_ip' in hostvars[hn] %}
+    server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:8443 check
+{% endif %}
+{% endfor %}
+
+listen lb_router_ssl
+    bind		*:443
+    mode                tcp
+    option              tcplog
+    option              tcp-check
+    # option              ssl-hello-chk
+
+    balance source
+{% for hn in groups.masters %}
+{% if 'internal_ip' in hostvars[hn] %}
+    server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:443 check
+{% endif %}
+{% endfor %}
+
+listen lb_router_http
+    bind		*:80
+    mode                tcp
+    option              tcplog
+    option              tcp-check
+    # option              ssl-hello-chk
+
+    balance source
+{% for hn in groups.masters %}
+{% if 'internal_ip' in hostvars[hn] %}
+    server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:80 check
+{% endif %}
+{% endfor %}

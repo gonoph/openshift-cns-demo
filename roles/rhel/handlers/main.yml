@@ -1,0 +1,80 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: restart network
+  shell: |
+    ifdown {{ ansible_default_ipv4.alias }} ; ifup {{ ansible_default_ipv4.alias }}
+  notify:
+    - stop docker
+    - start docker
+
+- name: disable all repos
+  when: ansible_pkg_mgr == 'yum'
+  shell: |
+    set -e -E;
+    T=$(mktemp);
+    TT=$(mktemp);
+    egrep -h '\[.*\]' /etc/yum.repos.d/redhat.repo  > $T;
+    egrep -h '\[.*\]' /etc/yum.repos.d/*.repo > $TT;
+    fgrep -vf $T $TT | tr -d '[]' | xargs -n 1 yum-config-manager --disable
+
+- name: enable repos
+  subscription_repos:
+    repos: "{{ subscription_repos }}"
+
+- name: restart sshd
+  systemd:
+    name: sshd
+    state: restarted
+
+- name: stop docker
+  systemd:
+    state: stopped
+    name: docker
+
+- name: add docker group
+  user:
+    name: "{{ ansible_user }}"
+    append: true
+    groups: docker
+
+- name: remove docker-pool
+  when: docker_storage_dev | length > 0
+  lvol:
+    vg: atomicos
+    lv: docker-pool
+    state: absent
+    force: yes
+
+- name: clear docker-storage
+  when: docker_storage_dev | length > 0
+  file:
+    path: "/etc/sysconfig/docker-storage"
+    state: absent
+
+- name: remove lib docker
+  when: docker_storage_dev | length > 0
+  file:
+    path: "/var/lib/docker"
+    state: absent
+
+- name: run docker-storage-setup
+  when: docker_storage_dev | length > 0
+  systemd:
+    state: restarted
+    name: docker-storage-setup
+
+- name: expand root lv
+  lvol:
+    vg: atomicos
+    lv: root
+    size: 100%PVS
+
+- name: expand root xfs
+  command: "/usr/sbin/xfs_growfs /"
+
+- name: start docker
+  systemd:
+    state: started
+    enabled: true
+    name: docker

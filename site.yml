@@ -1,0 +1,13 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: create EC2 VMs
+  import_playbook: create.yml
+
+- name: Configure VMs
+  import_playbook: configure.yml
+
+- name: Install Openshift
+  import_playbook: /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+
+- name: Post Configure VMs
+  import_playbook: post_configure.yml

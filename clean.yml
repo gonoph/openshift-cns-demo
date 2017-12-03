@@ -1,0 +1,71 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: read in secret vars
+  hosts: all
+  gather_facts: false
+  connection: local
+  tasks: 
+  - include_vars: secret.yml
+    run_once: true
+
+- name: Get EC2 instances
+  hosts: ec2
+  gather_facts: false
+  connection: local
+  roles: 
+  - ec2
+
+- name: Unregister systems
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+  - name: unregister system
+    ignore_errors: true
+    redhat_subscription:
+      state: 'absent'
+    when: ansible_host | default(False)
+
+- name: Remove EC2 instances
+  hosts: ec2
+  gather_facts: false
+  connection: local
+  vars:
+    ec2_destroy: true
+
+  roles:
+    - ec2
+
+  tasks:
+  - meta: clear_host_errors
+  - meta: refresh_inventory
+
+- name: remove instances from ssh config
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: OSEv3
+  gather_facts: false
+  connection: local
+  tags: [ always ]
+  tasks:
+    - name: removing from ssh config
+      run_once: true
+      blockinfile:
+        marker: "# {mark} OCP-DEMO MANAGED BLOCK"
+        path: ~/.ssh/config
+        state: absent
+
+- name: Final clean up
+  hosts: all
+  gather_facts: false
+  connection: local
+  serial: 1
+
+  tasks: 
+  - name: "Removing ssh key for host"
+    command: "{{ item }}"
+    with_items: "{{ cmds }}"
+    vars:
+      cmds:
+        - /usr/bin/ssh-keygen -R "{{ inventory_hostname }}"
+        - /usr/bin/ssh-keygen -R "{{ ansible_host }}"

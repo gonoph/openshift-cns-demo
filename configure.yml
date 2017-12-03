@@ -1,0 +1,43 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: read in secret vars
+  any_errors_fatal: true
+  hosts: all
+  gather_facts: false
+  connection: local
+  tags: [ always ]
+  tasks: 
+  - include_vars: secret.yml
+    run_once: true
+
+- name: pre-configure EC2 instances
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: ec2
+  gather_facts: false
+  connection: local
+  tags: [ ec2 ]
+  roles:
+    - ec2
+
+- name: Configure haproxy instances
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: haproxy
+  gather_facts: true
+  connection: smart
+  tags: [ haproxy ]
+  roles:
+    - haproxy
+  tasks: []
+
+- name: Configure instances
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: all !haproxy
+  gather_facts: true
+  connection: smart
+  tags: [ rhel ]
+  roles:
+    - rhel
+  tasks: []

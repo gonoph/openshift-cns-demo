@@ -1,0 +1,87 @@
+# vim: filetype=dosini
+
+[centos:vars]
+ansible_user=cloud-user
+is_atomic=True
+private_ip_start=10
+private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}
+
+[centos]
+master1.example.com
+node[2:3].example.com
+proxy.example.com 
+
+[haproxy:vars]
+docker_storage_dev=''
+
+[haproxy]
+proxy.example.com
+
+[ec2:vars]
+ec2_mynetworks=[ "108.247.233.239/32" ]
+ec2_instance_type=m4.xlarge
+ec2_ami_image=ami-70e8fd66
+# lookup the ec2_vpc_subnet from the vpc if not defined
+# ec2_vpc_subnet=subnet-5249f625
+ec2_vpc_id=vpc-9dd64bf8
+
+[ec2]
+master1.example.com
+node[2:3].example.com
+proxy.example.com ec2_volumes='[{"volume_size": 10, "delete_on_termination": true, "volume_type": "gp2", "device_name": "{{ ec2_drive_map.0 }}"}]' ec2_instance_type=t2.small
+
+[OSEv3:children]
+nodes
+masters
+etcd
+haproxy
+# lb
+
+[OSEv3:vars]
+openshift_release=v3.6
+openshift_deployment_type=origin
+openshift_disable_check=memory_availability,disk_availability
+containerized={{ is_atomic }}
+openshift_hostname={{ inventory_hostname }}
+
+openshift_cloudprovider_kind=aws
+openshift_cloudprovider_aws_access_key={{ aws_access_key }}
+openshift_cloudprovider_aws_secret_key={{ aws_secret_key }}
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+# admin: adminuser123
+# demo: demouser123
+openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
+
+# openshift_master_cluster_method=native
+# openshift_master_cluster_hostname=ocp.example.com
+# openshift_master_cluster_public_hostname=ocp.example.com
+openshift_master_default_subdomain=apps.example.com
+
+openshift_clock_enabled=True
+
+openshift_hosted_metrics_deploy=True
+openshift_hosted_logging_deploy=True
+# openshift_logging_kibana_proxy_debug=True
+
+openshift_hosted_logging_hostname=kibana.apps.example.com
+openshift_master_logging_public_url=https://kibana.apps.example.com
+
+openshift_schedulable=True
+openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+openshift_ip={{ internal_ip }}
+openshift_public_ip={{ ansible_host }}
+
+openshift_dns_ip=172.200.0.1
+openshift_portal_net=172.200.0.0/16
+openshift_master_ingress_ip_network_cidr=172.250.0.0/16
+
+[masters]
+master1.example.com
+
+[etcd]
+master1.example.com
+
+[nodes]
+master1.example.com
+node[2:3].example.com

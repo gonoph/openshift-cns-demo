@@ -1,0 +1,23 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: read in secret vars
+  any_errors_fatal: true
+  hosts: all
+  gather_facts: false
+  connection: local
+  tags: [ always ]
+  tasks: 
+  - include_vars: secret.yml
+    run_once: true
+
+- name: post configuration tasks
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: masters
+  gather_facts: true
+  tags: [ post ]
+  roles: [ rhel ]
+  tasks:
+    - name: add admin user as cluster admin
+      command: oc adm policy add-cluster-role-to-user admin admin
+      changed: false
