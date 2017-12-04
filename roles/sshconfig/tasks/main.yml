@@ -1,0 +1,39 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: ensure ~/.ssh dir exists
+  run_once: true
+  file:
+    path: "{{ sshconfig_path | dirname }}"
+    mode: 0700
+    state: directory
+
+- name: ensure ~/.ssh/config file exists
+  run_once: true
+  file:
+    path: "{{ sshconfig_path }}"
+    state: touch
+
+- name: removing from ssh config
+  when: sshconfig_clean is defined
+  run_once: true
+  blockinfile:
+    marker: "# {mark} OCP-DEMO MANAGED BLOCK"
+    path: "{{ sshconfig_path }}"
+    state: absent
+
+- name: adding to ssh config
+  when: sshconfig_clean is not defined
+  run_once: true
+  blockinfile:
+    marker: "# {mark} OCP-DEMO MANAGED BLOCK"
+    path: "{{ sshconfig_path }}"
+    block: |
+      {% for hn in play_hosts %}
+      {% if hostvars[hn].public_ip | default('') | length > 0 %}
+      Host {{ hn }} {{ hn.split('.') | first }}
+        Hostname {{ hostvars[hn].public_ip }}
+        UserKnownHostsFile /dev/null
+        User {{ ansible_user }}
+      {% endif %}
+      {% endfor %}
