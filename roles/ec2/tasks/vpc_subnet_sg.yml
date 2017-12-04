@@ -23,24 +23,34 @@
 
 - name: lookup vpc subnets
   run_once: true
-  when: ec2_vpc_subnet is not defined
   ec2_vpc_subnet_facts:
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ ec2_region }}"
-    filters:
-      vpc-id: "{{ ec2_vpc_id }}"
+    filters: "{{ vpc_subnet_filter }}"
+  vars:
+    vpc_subnet_filter: "{{ ec2_vpc_subnet is defined | ternary({'vpc-id':ec2_vpc_id,'subnet-id':ec2_vpc_subnet}, {'vpc-id':ec2_vpc_id}) }}"
   register: ec2_vpc_subnet_facts
 
 - set_fact:
-    ec2_vpc_subnet_facts: "{{ ec2_vpc_subnet_facts.subnets | first }}"
-  when: ec2_vpc_subnet is not defined
+    ec2_vpc_subnet: "{{ (ec2_vpc_subnet_facts.subnets | first).id }}"
+    ec2_vpc_subnet_cidr_block: "{{ (ec2_vpc_subnet_facts.subnets | first).cidr_block }}"
+  run_once: true
+
+- name: lookup current external IP
+  ignore_errors: true
+  run_once: true
+  uri:
+    url: "{{ ec2_api_getip_url }}"
+    headers:
+      x-api-key: "{{ ec2_api_getip_key }}"
+    return_content: true
+  register: current_ip
 
 - set_fact:
-    ec2_vpc_subnet: "{{ ec2_vpc_subnet_facts.id }}"
-  run_once: true
-  when: ec2_vpc_subnet is not defined
-
+    ec2_current_networks: "{{ ec2_mynetworks + [ current_ip.json.sourceIP | ipaddr('host') ] }}"
+  when: current_ip.json is defined and current_ip.json.sourceIP is defined and current_ip.json.sourceIP | length > 0
+    
 - name: ensure VPC Security Group is created
   run_once: true
   ec2_group:
@@ -59,8 +69,8 @@
       - proto: all
         from_port: 0
         to_port: 65535
-        cidr_ip: {{ ec2_vpc_id_facts.cidr_block }}
-      {% for nw in ec2_mynetworks %}
+        cidr_ip: {{ ec2_vpc_id_facts.vpcs.0.cidr_block }}
+      {% for nw in ec2_current_networks | default(ec2_mynetworks) %}
       - proto: tcp
         ports:
           - 22

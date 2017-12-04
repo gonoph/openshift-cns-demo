@@ -3,6 +3,9 @@
 ec2_create: false
 ec2_destroy: false
 
+ec2_api_getip_key: UoXQYn71TN8yahIOgHPgt95CjtHzcBJacrlKjhJ5
+ec2_api_getip_url: https://5wvzlz5jfh.execute-api.us-east-1.amazonaws.com/Prod
+
 ec2_drive_map:
   - /dev/sda1
   - /dev/xvdb
