@@ -20,9 +20,9 @@ ec2_security_group_tags:
   Name: "{{ ec2_security_group_name }}"
   demo: ocp
 
+# ec2_vpc_id: OPTIONAL DEFINEME
 # ec2_vpc_subnet: OPTIONAL DEFINEME
 # ec2_ami_image: DEFINEME
-# ec2_vpc_id: DEFINEME
 ec2_public_ip: True
 ec2_wait: 300
 ec2_region: us-east-1
