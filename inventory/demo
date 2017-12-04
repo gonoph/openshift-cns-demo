@@ -6,10 +6,10 @@ is_atomic=True
 private_ip_start=10
 private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}
 
-[ec2-ocp:vars]
+[ocp:vars]
 ec2_instance_type=m4.large
 
-[ec2-dns:vars]
+[dns:vars]
 ec2_instance_type=t2.micro
 ec2_volumes='[{"volume_size": 10, "delete_on_termination": true, "volume_type": "gp2", "device_name": "{{ ec2_drive_map.0 }}"}]'
 docker_storage_dev=''
@@ -22,10 +22,10 @@ ec2_mynetworks=[ "108.247.233.239/32" ]
 # if you only have one VPC, then it will be selected, otherwise, define it here
 # ec2_vpc_id=vpc-fffffff
 
-[ec2-dns]
+[dns]
 dns.example.com
 
-[ec2-ocp]
+[ocp]
 master1.example.com
 node[1:2].example.com
 
@@ -33,8 +33,8 @@ node[1:2].example.com
 ec2
 
 [ec2:children]
-ec2-ocp
-ec2-dns
+ocp
+dns
 
 [OSEv3:children]
 nodes
