@@ -7,7 +7,11 @@
 - include_tasks: dns.yml
   tags: [ rhel, rhel_dns ]
 
+- debug:
+    var: "hostvars['dns.example.com']"
+
 - include_tasks: subscription.yml
+  when: "ansible_os_family == 'RedHat'"
   tags: [ rhel, rhel_subscription ]
 
 - include_tasks: services.yml
