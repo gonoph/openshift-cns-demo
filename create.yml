@@ -7,8 +7,10 @@
   connection: local
   tags: [ always ]
   tasks: 
-  - include_vars: secret.yml
+  - include_vars: "{{ SECRETS }}"
+    when: SECRETS is defined
     run_once: true
+
 
 - name: Create EC2 instances
   any_errors_fatal: true
