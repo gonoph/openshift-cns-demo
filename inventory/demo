@@ -1,7 +1,7 @@
 # vim: filetype=dosini
 
 [centos:vars]
-ansible_user=cloud-user
+ansible_user=centos
 is_atomic=True
 private_ip_start=10
 private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}

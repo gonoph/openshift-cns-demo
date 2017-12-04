@@ -7,7 +7,8 @@
   connection: local
   tags: [ always ]
   tasks: 
-  - include_vars: secret.yml
+  - include_vars: "{{ SECRETS }}"
+    when: SECRETS is defined
     run_once: true
 
 - name: pre-configure EC2 instances
