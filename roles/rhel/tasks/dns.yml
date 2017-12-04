@@ -19,7 +19,7 @@
 
 - set_fact:
     out_resolv: "{{ out_resolv.stdout | from_yaml }}"
-    dns_ip: "{{ (hostvars[groups.haproxy | first | default('')]| default({})).internal_ip | default('') }}"
+    dns_ip: "{{ (hostvars[groups.dns | first | default('')]| default({})).internal_ip | default('') }}"
 
 - debug:
     var: vv
@@ -32,7 +32,7 @@
 - name: point dns locally
   command: "/usr/bin/nmcli c modify '{{ out_profile.uuid }}' -ipv4.dns '' ipv4.dns {{ dns_ip }} ipv4.ignore-auto-dns yes"
   when: |
-    inventory_hostname not in groups.haproxy and
+    inventory_hostname not in groups.dns and
     dns_ip | length > 0 and
     dns_ip not in out_resolv.dns and
     not out_resolv['ignore-auto-dns']
