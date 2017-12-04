@@ -20,21 +20,21 @@
   roles:
     - ec2
 
-- name: Configure haproxy instances
+- name: Configure dns instances
   any_errors_fatal: true
   force_handlers: true
-  hosts: haproxy
+  hosts: dns
   gather_facts: true
   connection: smart
-  tags: [ haproxy ]
+  tags: [ dns ]
   roles:
-    - haproxy
+    - dns
   tasks: []
 
 - name: Configure instances
   any_errors_fatal: true
   force_handlers: true
-  hosts: all !haproxy
+  hosts: all !dns
   gather_facts: true
   connection: smart
   tags: [ rhel ]

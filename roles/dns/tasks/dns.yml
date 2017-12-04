@@ -47,7 +47,7 @@
     block: |
       {% for hn in groups.ec2 %}
       {% if 'internal_ip' in hostvars[hn] %}
-      {% if hn in groups.haproxy %}
+      {% if hn in groups.dns %}
       {{ hostvars[hn].internal_ip }}  {{ hn }} {{ openshift_master_cluster_hostname }} {{ openshift_master_default_subdomain }}
       {% else %}
       {{ hostvars[hn].internal_ip }}  {{ hn }}

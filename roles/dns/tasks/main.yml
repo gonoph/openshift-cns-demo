@@ -2,7 +2,7 @@
 ---
 
 - include_tasks: proxy.yml
-  tags: [ haproxy, haproxy_proxy ]
+  tags: [ dns, dns_proxy ]
 
 - include_tasks: dns.yml
-  tags: [ haproxy, haproxy_dns ]
+  tags: [ dns, dns_dns ]
