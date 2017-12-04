@@ -16,5 +16,5 @@ clean: $(DOCKERFILE).template
 	rm -fv $(DOCKERFILE)
 
 run: $(DOCKERFILE)
-	docker run --rm -it -v $(MAKEFILE_DIR)..:/tmp/install:Z $(DOCKER_LABEL)
-	echo $(MAKEFILE_DIR)
+	[ -d /tmp/secrets.$$USER ] || mv -v `mktemp -d` /tmp/secrets.$$USER
+	docker run --rm -it -v $(MAKEFILE_DIR)..:/tmp/install:Z -v /tmp/secrets.$$USER:/tmp/secrets:Z $(DOCKER_LABEL)
