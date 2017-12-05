@@ -18,8 +18,12 @@
   register: out_resolv
 
 - set_fact:
-    out_resolv: "{{ out_resolv.stdout | from_yaml }}"
+    out_resolv:
+      dns: "{{ ( yml.dns | default('') ) is none | ternary('', yml.dns | default('') ) }}"
+      ignore-auto-dns: "{{ yml['ignore-auto-dns'] | default(False) }}"
     dns_ip: "{{ (hostvars[groups.dns | first | default('')]| default({})).internal_ip | default('') }}"
+  vars:
+    yml: "{{ out_resolv.stdout | from_yaml }}"
 
 - debug:
     var: vv

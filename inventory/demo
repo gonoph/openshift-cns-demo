@@ -40,6 +40,7 @@ dns
 nodes
 masters
 etcd
+centos
 # lb
 
 [OSEv3:vars]
