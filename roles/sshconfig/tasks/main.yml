@@ -10,10 +10,11 @@
 
 - name: ensure ~/.ssh/config file exists
   run_once: true
-  file:
-    path: "{{ sshconfig_path }}"
-    state: touch
+  copy:
+    dest: "{{ sshconfig_path }}"
+    content: ''
     mode: 0640
+    force: false
 
 - name: removing from ssh config
   when: sshconfig_clean is defined
