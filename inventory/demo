@@ -26,7 +26,7 @@ ec2_mynetworks=[ "108.247.233.239/32" ]
 dns.example.com
 
 [ocp]
-master1.example.com
+master.example.com
 node[1:2].example.com
 
 [fedora:children]
@@ -83,11 +83,11 @@ openshift_portal_net=172.200.0.0/16
 openshift_master_ingress_ip_network_cidr=172.250.0.0/16
 
 [masters]
-master1.example.com
+master.example.com
 
 [etcd]
-master1.example.com
+master.example.com
 
 [nodes]
-master1.example.com
+master.example.com
 node[1:2].example.com

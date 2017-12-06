@@ -4,16 +4,19 @@ ENV	PS1='\[\033[01;30m\](\[\033[01;32m\]container\[\033[01;30m\])\[\033[0m\] [\u
 	BUILD_UID=%%UID%% \
 	BUILD_GID=%%GID%%
 RUN     yum update -y \
-	&& yum install -y epel-release centos-release-openshift-origin36.noarch \
 	&& yum install -y \
-	sudo \
-        atomic-openshift-utils \
-        openssh-clients \
-        vim \
+	ansible \
+	git \
+	origin-clients \
 	python2-pip \
+	sudo \
+        vim \
         && rm -rf /var/cache/yum \
         && pip install -U pip \
-        && pip install boto3 boto \
+        && pip install \
+	boto \
+	boto3 \
+	netaddr \
         && rm /root/.cache/pip/ -rf \
         && groupadd -g $BUILD_GID ansible \
         && useradd -u $BUILD_UID -g $BUILD_GID ansible -G wheel \

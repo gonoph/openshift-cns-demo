@@ -1,5 +1,5 @@
 *~
-bootstrap/Dockerfile.centos
+bootstrap/Dockerfile
 *.retry
 # Byte-compiled / optimized / DLL files
 __pycache__/

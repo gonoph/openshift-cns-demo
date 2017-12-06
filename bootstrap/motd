@@ -24,7 +24,7 @@ or
 
 1. ansible_user - the initial ansible_user for the VMs (ec2 is normally NOT root).
 2. ec2_mynetworks - list of networks/hosts to allow access to the demo EC2 VMs
-3. ec2_ami_image - the EC2 ami image, currently using the CENTOS image, you may need to update it.
+3. ec2_ami_image - the EC2 ami image, currently using the Fedora 27 Atomic image, you may need to update it.
 4. ec2_instance_type - the ec2 instance type, currently the dns server needs t2.micro, and the OCP VMs use m4.large
 
 
