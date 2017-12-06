@@ -1,7 +1,7 @@
 .PHONY: all build clean run
 MAKEFILE_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-DOCKERFILE?=Dockerfile.centos
+DOCKERFILE?=Dockerfile
 DOCKER_LABEL?=localhost/ocp-installer:latest
 
 all: build
