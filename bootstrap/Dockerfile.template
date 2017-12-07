@@ -22,7 +22,7 @@ RUN     yum update -y \
         && useradd -u $BUILD_UID -g $BUILD_GID ansible -G wheel \
         && echo 'ansible  ALL=(ALL)       NOPASSWD: ALL' > /etc/sudoers.d/ansible_conf
 WORKDIR	/tmp/install
-COPY	motd /etc/motd
+COPY	Readme.md /etc/motd
 RUN	echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' > /etc/profile.d/motd.sh
 USER    ansible
 CMD [ "/usr/bin/bash" ]
