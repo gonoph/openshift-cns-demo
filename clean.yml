@@ -27,8 +27,7 @@
     ignore_errors: true
     redhat_subscription:
       state: 'absent'
-    when: |
-      ansible_host | default(False) and ansible_distribution == 'Red Hat Enterprise Linux'
+    when: ansible_host | default(False)
 
 - name: Remove EC2 instances
   hosts: ec2
