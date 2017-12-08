@@ -42,4 +42,5 @@
     not out_resolv['ignore-auto-dns']
   notify: restart network
 
-- meta: flush_handlers
+- name: ensure network restarted
+  meta: flush_handlers
