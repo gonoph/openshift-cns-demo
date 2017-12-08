@@ -19,6 +19,7 @@
     fgrep -vf $T $TT | tr -d '[]' | xargs -n 1 yum-config-manager --disable
 
 - name: enable repos
+  when: ansible_pkg_mgr == 'yum'
   subscription_repos:
     repos: "{{ subscription_repos }}"
 
@@ -65,6 +66,8 @@
     name: docker-storage-setup
 
 - name: expand root lv
+  when: |
+    ansible_mounts | json_query("[?mount=='/'] | [?contains(device, 'atomicos')].device") | length > 0
   lvol:
     vg: atomicos
     lv: root
