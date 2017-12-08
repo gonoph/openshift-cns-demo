@@ -7,6 +7,9 @@
 - include_tasks: dns.yml
   tags: [ rhel, rhel_dns ]
 
+- include_tasks: hostname.yml
+  tags: [ rhel, rhel_hostname ]
+
 - include_tasks: subscription.yml
   when: "ansible_distribution == 'Red Hat Enterprise Linux'"
   tags: [ rhel, rhel_subscription ]
@@ -16,5 +19,3 @@
 
 - include_tasks: storage.yml
   tags: [ rhel, rhel_storage ]
-
-- meta: flush_handlers
