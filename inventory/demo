@@ -1,10 +1,11 @@
 # vim: filetype=dosini
 
-[fedora:vars]
-ansible_user=fedora
+[rhel:vars]
+ansible_user=ec2-user
 is_atomic=True
 private_ip_start=10
 private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}
+rhel_extras_repo=rhui-REGION-rhel-server-extras
 
 [ocp:vars]
 ec2_instance_type=m4.large
@@ -15,7 +16,10 @@ ec2_volumes='[{"volume_size": 10, "delete_on_termination": true, "volume_type": 
 docker_storage_dev=''
 
 [ec2:vars]
-ec2_ami_image=ami-ba1c87c0
+# the following is RHEL 7.4 in us-east-1 via Cloud Access
+ec2_ami_image=ami-7a96b801
+# the following is RHEL Atomic 7.4 in us-east-1 via Cloud Access (recommended)
+# ec2_ami_image=ami-ac910ed6
 ec2_mynetworks=[ "108.247.233.239/32" ]
 # subnet will be picked from 1st subnet found in VPC if not defined
 # ec2_vpc_subnet=subnet-ffffffff
@@ -29,7 +33,7 @@ dns.example.com
 master.example.com
 node[1:2].example.com
 
-[fedora:children]
+[rhel:children]
 ec2
 
 [ec2:children]
@@ -40,7 +44,7 @@ dns
 nodes
 masters
 etcd
-fedora
+rhel
 # lb
 
 [OSEv3:vars]
