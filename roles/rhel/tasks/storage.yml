@@ -4,7 +4,7 @@
   template:
     src: "docker-storage-setup.j2"
     dest: "/etc/sysconfig/docker-storage-setup"
-  when: ansible_pkg_mgr != 'yum'
+  when: docker_storage_dev | length > 0
   notify:
     - stop docker
     - remove docker-pool
@@ -14,3 +14,5 @@
     - expand root lv
     - expand root xfs
     - start docker
+
+- meta: flush_handlers
