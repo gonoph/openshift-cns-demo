@@ -6,3 +6,12 @@ subscription_repos:
   - rhel-7-server-ose-3.6-rpms
   - rhel-7-fast-datapath-rpms
 docker_storage_dev: /dev/xvdb
+
+rhel_install_packages:
+  - docker
+  - dnsmasq
+  - python-docker-py
+  - skopeo
+  - cockpit-docker
+  - etcd
+  - flannel

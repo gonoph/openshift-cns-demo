@@ -7,9 +7,7 @@
     name: "{{ item }}"
     state: present
     enablerepo: "{{ (rhel_extras_repo | default('') | trim | length > 0) | ternary(rhel_extras_repo, omit) }}"
-  with_items:
-    - docker
-    - dnsmasq
+  with_items: "{{ rhel_install_packages }}"
   notify:
     - stop docker
     - start docker
