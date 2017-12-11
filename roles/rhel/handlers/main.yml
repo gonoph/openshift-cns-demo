@@ -66,8 +66,7 @@
     name: docker-storage-setup
 
 - name: expand root lv
-  when: |
-    ansible_mounts | json_query("[?mount=='/'] | [?contains(device, 'atomicos')].device") | length > 0
+  when: "(ansible_mounts | to_json | from_json | json_query(\"[?mount=='/'].device | [?contains(@, 'atomicos')]\")) | length > 0"
   lvol:
     vg: atomicos
     lv: root
