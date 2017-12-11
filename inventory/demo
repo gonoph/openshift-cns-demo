@@ -2,7 +2,6 @@
 
 [rhel:vars]
 ansible_user=ec2-user
-is_atomic=True
 private_ip_start=10
 private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}
 rhel_extras_repo=rhui-REGION-rhel-server-extras
@@ -48,15 +47,18 @@ rhel
 # lb
 
 [OSEv3:vars]
-openshift_release=v3.6
+openshift_release=v3.6.1
 openshift_deployment_type=origin
 openshift_disable_check=memory_availability,disk_availability
-containerized={{ is_atomic }}
+containerized=True
 openshift_hostname={{ inventory_hostname }}
 
-openshift_cloudprovider_kind=aws
-openshift_cloudprovider_aws_access_key={{ aws_access_key }}
-openshift_cloudprovider_aws_secret_key={{ aws_secret_key }}
+# will test this later
+# openshift_cloudprovider_kind=aws
+# openshift_cloudprovider_aws_access_key={{ aws_access_key }}
+# openshift_cloudprovider_aws_secret_key={{ aws_secret_key }}
+# if defning the above, then comment out below
+openshift_master_ingress_ip_network_cidr=172.250.0.0/16
 
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 # admin: adminuser123
@@ -82,9 +84,9 @@ openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
 openshift_ip={{ internal_ip }}
 openshift_public_ip={{ ansible_host }}
 
-openshift_dns_ip=172.200.0.1
+# XXX don't really need this
+# openshift_dns_ip=172.200.0.1
 openshift_portal_net=172.200.0.0/16
-openshift_master_ingress_ip_network_cidr=172.250.0.0/16
 
 [masters]
 master.example.com
