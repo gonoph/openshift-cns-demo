@@ -7,9 +7,12 @@ RUN     yum update -y \
 	&& yum install -y \
 	ansible \
 	git \
+	httpd-tools \
 	origin-clients \
+	python2-passlib \
 	python2-pip \
 	python3.x86_64 \
+	python3-passlib \
 	python3-pip \
 	sudo \
         vim \

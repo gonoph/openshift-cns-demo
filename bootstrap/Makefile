@@ -17,4 +17,4 @@ clean: $(DOCKERFILE).template
 
 run: $(DOCKERFILE)
 	[ -d /tmp/secrets.$$USER ] || mv -v `mktemp -d` /tmp/secrets.$$USER
-	docker run --rm -it -v $(MAKEFILE_DIR)..:/tmp/install:Z -v /tmp/secrets.$$USER:/tmp/secrets:Z $(DOCKER_LABEL)
+	docker run --name=ocp-installer --rm -it -v $(MAKEFILE_DIR)..:/tmp/install:Z -v /tmp/secrets.$$USER:/tmp/secrets:Z $(DOCKER_LABEL)
