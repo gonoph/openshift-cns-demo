@@ -8,6 +8,7 @@ RUN     yum update -y \
 	ansible \
 	git \
 	httpd-tools \
+	java-1.8.0-openjdk-headless \
 	origin-clients \
 	python2-passlib \
 	python2-pip \
