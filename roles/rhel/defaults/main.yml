@@ -15,4 +15,3 @@ rhel_install_packages:
   - cockpit-docker
   - etcd
   - flannel
-  - python-passlib
