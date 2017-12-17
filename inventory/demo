@@ -7,7 +7,8 @@ private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'
 rhel_extras_repo=rhui-REGION-rhel-server-extras
 
 [ocp:vars]
-ec2_instance_type=m4.large
+# ec2_instance_type=m4.large
+ec2_instance_type=t2.medium
 
 [dns:vars]
 ec2_instance_type=t2.micro
