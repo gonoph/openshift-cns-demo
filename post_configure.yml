@@ -11,6 +11,16 @@
     when: SECRETS is defined
     run_once: true
 
+- name: pre-configure EC2 instances
+  any_errors_fatal: true
+  force_handlers: true
+  hosts: ec2
+  gather_facts: false
+  connection: local
+  tags: [ ec2 ]
+  roles:
+    - ec2
+
 - name: post configuration tasks
   any_errors_fatal: true
   force_handlers: true
@@ -21,4 +31,28 @@
   tasks:
     - name: add admin user as cluster admin
       command: oc adm policy add-cluster-role-to-user admin admin
-      changed: false
+
+    - name: copy ca.crt to localhost
+      fetch:
+        src: /etc/origin/master/ca.crt
+        dest: /tmp/ca.crt
+        flat: yes
+
+    - name: add hosts to /etc/hosts file
+      connection: local
+      become: true
+      run_once: true
+      blockinfile:
+        unsafe_writes: true
+        path: /etc/hosts
+        block: |
+          {% for hn in groups.OSEv3 %}
+          {% if hostvars[hn].public_ip | default('') | length > 0 %}
+          {{ hostvars[hn].public_ip }}     {{ hn }}
+          {% endif %}
+          {% endfor %}
+
+    - name: login locally to ocp master as admin
+      connection: local
+      run_once: true
+      command: "/usr/bin/oc login --certificate-authority=/tmp/ca.crt https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
