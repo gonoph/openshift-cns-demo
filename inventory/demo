@@ -33,6 +33,14 @@ dns.example.com
 master.example.com
 node[1:2].example.com
 
+[storage:vars]
+storage_device=/dev/xvdc
+storage_routes="deploy-heketi-storage.{{openshift_master_default_subdomain}} heketi-storage.{{openshift_master_default_subdomain}}"
+
+[storage]
+master.example.com
+node[1:2].example.com
+
 [rhel:children]
 ec2
 

@@ -1,0 +1,14 @@
+---
+clusters:
+- nodes:
+{% for hn in play_hosts %}
+  - devices:
+    - "{{ storage_device }}"
+    node:
+      hostnames:
+        manage:
+          - "{{ hn }}"
+        storage:
+          - "{{ hostvars[hn].internal_ip }}"
+      zone: {{ loop.index }}
+{% endfor %}

@@ -30,7 +30,7 @@
   roles: [ rhel ]
   tasks:
     - name: add admin user as cluster admin
-      command: oc adm policy add-cluster-role-to-user admin admin
+      command: oc adm policy add-cluster-role-to-user cluster-admin admin
 
     - name: copy ca.crt to localhost
       fetch:
@@ -47,9 +47,10 @@
         path: /etc/hosts
         block: |
           {% for hn in groups.OSEv3 %}
-          {% if hostvars[hn].public_ip | default('') | length > 0 %}
-          {{ hostvars[hn].public_ip }}     {{ hn }}
-          {% endif %}
+          {%   if hostvars[hn].public_ip | default('') | length > 0 %}
+          {%     set routes = '' if hn not in groups.masters else storage_routes %}
+          {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }}
+          {%   endif %}
           {% endfor %}
 
     - name: login locally to ocp master as admin

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  creationTimestamp: null
+  name: glusterfs-cluster1
+subsets:
+- addresses:
+{% for hn in play_hosts %}
+  - ip: {{ hostvars[hn].internal_ip }}
+{% endfor %}
+  ports:
+  - port: 1
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glusterfs-cluster1
+spec:
+  ports:
+    - port: 1
