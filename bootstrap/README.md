@@ -40,22 +40,3 @@ And when you're done:
 ```bash
 ./clean.sh
 ```
-# Explaination of playbooks:
-
-1. `inventory/demo` - contains all the hosts for the demo, currently configured for AWS EC2 with one small dns VM, ond 3 4 core VMs (master + two nodes).
-2. `clean.yml` - cleans up the inventory, removes everything
-3. `create.yml` - creates the VMs and prepares them to run the OCP playbook
-4. `/usr/share/ansible/openshift-ansible/playbooks/byo/config.yml` - the actual OCP installer playbook
-5. `post_configure.yml` - post installer, assigns admin role to admin user
-6. `site.yml`- runs all the playbooks above (except for clean.yml)
-
-# Important variables inventory variables
-
-1. `ansible_user` - the initial `ansible_user` for the VMs (ec2 is normally NOT root).
-1. `private_ip_start` - the start address for the hosts in the ec2 group (so we can have static addresses across boots).
-3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2 VMs
-4. `ec2_ami_image` - the EC2 ami image, currently using the Fedora 27 Atomic image, you may need to update it.
-5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs t2.micro, and the OCP VMs use m4.large
-6. `storage_routes` - This is used to add entries to the hosts file. It's most useful without dns, and running in the bootstrap container.
-
-

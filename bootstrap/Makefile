@@ -11,11 +11,12 @@ build: $(DOCKERFILE)
 
 GID=$(shell id -g)
 UID=$(shell id -u)
-$(DOCKERFILE): $(DOCKERFILE).template
+$(DOCKERFILE): $(DOCKERFILE).template Makefile
+	sed -n '/^# Explaination/,/# Getting Help/p' ../README.md  | head -n -1 > motd
 	sed -e "s,%%GID%%,$(GID)," -e "s,%%UID%%,$(UID)," $(DOCKERFILE).template > $(DOCKERFILE)
 
 clean: $(DOCKERFILE).template
-	rm -fv $(DOCKERFILE)
+	rm -fv $(DOCKERFILE) motd
 
 .ONESHELL:
 run: $(DOCKERFILE)
