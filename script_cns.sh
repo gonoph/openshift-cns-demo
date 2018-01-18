@@ -6,11 +6,12 @@ detail() {
 	echo "##########"
 }
 
-detail "Configuring nodes for storage"
-./demo.sh cns-configure.yml
-
-detail "Running deploy script for storage"
-./gluster-kubernetes/deploy/gk-deploy -g /tmp/topology.json  -n storage -y
+if [ "x$1" != "xtest" ] ; then
+	set -e -E
+	detail "Running deploy script for storage"
+	./gluster-kubernetes/deploy/gk-deploy -g /tmp/topology.json  -n storage -y
+	exit 0
+fi
 
 detail "Creating test PVC - claim1"
 
