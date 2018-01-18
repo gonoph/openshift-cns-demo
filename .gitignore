@@ -3,6 +3,9 @@
 bootstrap/Dockerfile
 *.retry
 bootstrap/aws
+bootstrap/motd
+.*.swp
+.flag-*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
