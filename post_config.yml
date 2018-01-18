@@ -16,7 +16,6 @@
   hosts: masters
   gather_facts: true
   tags: [ post ]
-  roles: [ rhel ]
   tasks:
     - name: add admin user as cluster admin
       command: oc adm policy add-cluster-role-to-user cluster-admin admin
