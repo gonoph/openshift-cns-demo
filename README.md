@@ -29,6 +29,19 @@ make help
 make all
 ```
 
+# Important inventory variables
+
+1. `ansible_user` - the initial `ansible_user` for the VMs (ec2 is normally NOT root).
+2. `private_ip_start` - the start address for the hosts in the ec2 group (so we
+   can have static addresses across boots).
+3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2 VMs
+4. `ec2_ami_image` - the EC2 ami image, currently using the Fedora 27 Atomic
+   image, you may need to update it.
+5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs
+   t2.micro, and the OCP VMs use m4.large
+6. `storage_routes` - This is used to add entries to the hosts file. It's most
+   useful without dns, and running in the bootstrap container.
+
 # Explaination of playbooks
 
 1. `clean.yml`: playbook to clean up the EC2 instances and the local environment.
@@ -44,19 +57,6 @@ make all
 The inventory is in `inventory/demo` and it contains all the hosts for the
 demo, currently configured for AWS EC2 with one small dns VM, ond 3 4 core VMs
 (master + two nodes).
-
-# Important inventory variables
-
-1. `ansible_user` - the initial `ansible_user` for the VMs (ec2 is normally NOT root).
-2. `private_ip_start` - the start address for the hosts in the ec2 group (so we
-   can have static addresses across boots).
-3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2 VMs
-4. `ec2_ami_image` - the EC2 ami image, currently using the Fedora 27 Atomic
-   image, you may need to update it.
-5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs
-   t2.micro, and the OCP VMs use m4.large
-6. `storage_routes` - This is used to add entries to the hosts file. It's most
-   useful without dns, and running in the bootstrap container.
 
 # Getting Help
 

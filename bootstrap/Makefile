@@ -12,7 +12,7 @@ build: $(DOCKERFILE)
 GID=$(shell id -g)
 UID=$(shell id -u)
 $(DOCKERFILE): $(DOCKERFILE).template Makefile
-	sed -n '/^# Explaination/,/# Getting Help/p' ../README.md  | head -n -1 > motd
+	sed -n '/^# Usage/,/# Explaination of playbooks/p' ../README.md  | head -n -1 > motd
 	sed -e "s,%%GID%%,$(GID)," -e "s,%%UID%%,$(UID)," $(DOCKERFILE).template > $(DOCKERFILE)
 
 clean: $(DOCKERFILE).template
