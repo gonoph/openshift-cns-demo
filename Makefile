@@ -1,6 +1,7 @@
-.PHONY: $(PLAYBOOK_targets) all clean help
+.PHONY: $(PLAYBOOK_targets) all clean help test
 MAKEFILE_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
+# DEBUG:=echo
 FLAG_CREATE:=.flag-create
 FLAG_CONFIG:=.flag-config
 FLAG_OCP:=.flag-ocp
@@ -35,24 +36,26 @@ help:
 
 all: create config ocp post cns-pre cns test
 clean: $(PLAYBOOK_CLEAN)
-	./demo.sh $<
+	$(DEBUG) ./demo.sh $<
 	rm -f .flag-*
 create: $(FLAG_CREATE)
-config: $(FLAG_CONFIG)
-ocp: $(FLAG_OCP)
-post: $(FLAG_POST)
-cns-pre: $(FLAG_CNS_PRE)
-cns: $(FLAG_CNS)
+config: create $(FLAG_CONFIG)
+ocp: config $(FLAG_OCP)
+post: ocp  $(FLAG_POST)
+cns-pre: post $(FLAG_CNS_PRE)
+cns: cns-pre $(FLAG_CNS)
+test: cns
+	$(DEBUG) ./$(SCRIPT_CNS) test
 
-$(FLAG_CREATE): $(PLAYBOOK_CREATE)
-$(FLAG_CONFIG): $(PLAYBOOK_CONFIG)
-$(FLAG_OCP): $(PLAYBOOK_OCP)
-$(FLAG_POST): $(PLAYBOOK_POST)
-$(FLAG_CNS_PRE): $(PLAYBOOK_CNS_PRE)
-$(FLAG_CNS): $(SCRIPT_CNS)
-	echo ./$<
+$(FLAG_CREATE): $(PLAYBOOK_CREATE) Makefile
+$(FLAG_CONFIG): $(PLAYBOOK_CONFIG) Makefile
+$(FLAG_OCP): $(PLAYBOOK_OCP) Makefile
+$(FLAG_POST): $(PLAYBOOK_POST) Makefile
+$(FLAG_CNS_PRE): $(PLAYBOOK_CNS_PRE) Makefile
+$(FLAG_CNS): $(SCRIPT_CNS) Makefile
+	$(DEBUG) ./$<
 	touch $@
 
 $(PLAYBOOK_flags):
-	echo ./demo.sh $<
+	$(DEBUG) ./demo.sh $<
 	touch $@
