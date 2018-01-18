@@ -1,6 +1,8 @@
+# customized ignores
 *~
 bootstrap/Dockerfile
 *.retry
+bootstrap/aws
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
