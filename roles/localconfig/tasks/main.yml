@@ -40,3 +40,17 @@
         User {{ ansible_user }}
       {% endif %}
       {% endfor %}
+
+- name: add hosts to /etc/hosts file
+  become: true
+  run_once: true
+  blockinfile:
+    unsafe_writes: true
+    path: /etc/hosts
+    block: |
+      {% for hn in groups.OSEv3 %}
+      {%   if hostvars[hn].public_ip | default('') | length > 0 %}
+      {%     set routes = '' if hn not in groups.masters else storage_routes %}
+      {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }}
+      {%   endif %}
+      {% endfor %}

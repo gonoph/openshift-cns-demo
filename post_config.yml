@@ -1,17 +1,6 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
-- name: read in secret vars
-  any_errors_fatal: true
-  hosts: all
-  gather_facts: false
-  connection: local
-  tags: [ always ]
-  tasks: 
-  - include_vars: "{{ SECRETS }}"
-    when: SECRETS is defined
-    run_once: true
-
-- name: pre-configure EC2 instances
+- name: get EC2 instances
   any_errors_fatal: true
   force_handlers: true
   hosts: ec2
@@ -33,27 +22,20 @@
       command: oc adm policy add-cluster-role-to-user cluster-admin admin
 
     - name: copy ca.crt to localhost
+      run_once: true
       fetch:
         src: /etc/origin/master/ca.crt
-        dest: /tmp/ca.crt
+        dest: /etc/pki/ca-trust/source/anchors/ocp-ca.crt
         flat: yes
 
-    - name: add hosts to /etc/hosts file
+    - name: update ca trusts
       connection: local
       become: true
       run_once: true
-      blockinfile:
-        unsafe_writes: true
-        path: /etc/hosts
-        block: |
-          {% for hn in groups.OSEv3 %}
-          {%   if hostvars[hn].public_ip | default('') | length > 0 %}
-          {%     set routes = '' if hn not in groups.masters else storage_routes %}
-          {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }}
-          {%   endif %}
-          {% endfor %}
+      command: update-ca-trust
 
     - name: login locally to ocp master as admin
       connection: local
       run_once: true
-      command: "/usr/bin/oc login --certificate-authority=/tmp/ca.crt https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
+      # command: "/usr/bin/oc login --certificate-authority=/etc/pki/ca-trust/source/anchors/ocp-ca.crt https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
+      command: "/usr/bin/oc login https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
