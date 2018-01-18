@@ -82,7 +82,7 @@ openshift_master_default_subdomain=apps.example.com
 openshift_clock_enabled=True
 
 openshift_hosted_metrics_deploy=True
-openshift_hosted_logging_deploy=True
+# openshift_hosted_logging_deploy=True
 # openshift_logging_kibana_proxy_debug=True
 
 openshift_hosted_logging_hostname=kibana.apps.example.com
