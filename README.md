@@ -102,14 +102,14 @@ demo, currently configured for AWS EC2 with one small dns VM, ond 3 4 core VMs
 **DISCLAIMER**: I'm a Red Hat Solutions Architect. It's my job to introduce Red
 Hat customers to Red Hat products, and help them gain the most value from these
 products. I am not support, nor releasing this as a reprepsentative of Red Hat.
-Thus I cannot help you use this playbook in production, enterprise, PoC, or
+Thus, I cannot help you use this playbook in production, enterprise, PoC, or
 bake-off situation. I will gladly help you get in contact with someone at Red
 Hat that **CAN** help you do these things.
 
-The purpose of this playbook is to build a demo and experimental environment to
-show the value of OCP and CNS backed by gluster. If you have any questions or
-run into issues running this playbook to achieve that goal, then please create
-a GitHub issue so I can address it!
+The purpose of this playbook is to build a demo and an experimental environment
+to show the value of OCP and CNS backed by gluster. If you have any questions
+or run into issues running this playbook to achieve that goal, then please
+create a GitHub issue so I can address it!
 
 If you have other questions or issues with OCP or CNS in general, I'll gladly
 help you reach the correct resource at Red Hat!
