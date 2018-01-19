@@ -9,6 +9,10 @@
   tags: [ ec2 ]
   roles:
     - ec2
+  tasks:
+    - name: set ansible user to root to fix playbook bug
+      set_fact:
+        ansible_user: root
 
 - name: Install Openshift
   import_playbook: ./openshift-ansible/playbooks/byo/config.yml
