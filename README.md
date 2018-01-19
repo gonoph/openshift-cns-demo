@@ -6,9 +6,10 @@ Demo of Openshift Container Platform (OCP) and Container Native Storage (CNS)
 The goal of this project is to help you test out Openshift Container Platorm
 (OCP) and Container Native Storage (CNS). It's using the opensource upstreams
 of the Red Hat products, as I'm not sure if the Developer Subscription or the
-CDK offers access to the production bits. I recommend using the supported bits
-as I've had to pin my dependency to the upstream projects to specific commit
-versions in order to make sure everything runs smoothly.
+CDK offers access to the production bits in a way that allows an operations guy
+to fully install a cluster like this. I recommend using the supported bits as
+I've had to pin my dependency to the upstream projects to specific branches in
+order to make sure everything runs smoothly.
 
 # bootstrap docker image
 
