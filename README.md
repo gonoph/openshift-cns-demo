@@ -46,6 +46,9 @@ Optionally, then build and run the included docker bootstrap image:
 
 ```bash
 cd bootstrap
+cp aws.sample aws
+# edit your aws information
+vi aws
 make
 make run
 ```
