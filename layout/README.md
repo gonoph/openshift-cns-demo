@@ -1,11 +1,11 @@
 # Layout of the demo
 
-You can architecture this however you want, but I tried to go minimum as
-possible to show CNS. This requires at least 3 nodes in the OCP cluster, with
-one being a master. You would not do this type of setup in production. In
-production, you would have 3 masters, your own custom CA certificate, multiple
-storage devices on dedicated storage nodes, and probably a hardware load
-balancer (or an AWS ELB instance).
+You can architect this however you want, but I tried to go minimum as possible
+to show CNS. This requires at least 3 nodes in the OCP cluster, with one being
+a master. You would not do this type of setup in production. In production, you
+would have 3 masters, your own custom CA certificate, multiple storage devices
+on dedicated storage nodes, and probably a hardware load balancer (or an AWS
+ELB instance).
 
 I needed to create a stand alone system to act as DNS, since I'm using
 hostnames that don't exist. OCP expects all the hostnames to resolve properly.
