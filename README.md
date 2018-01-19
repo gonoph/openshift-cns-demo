@@ -1,5 +1,5 @@
-# ocp-demo
-Demo of OCP and CNS
+# openshift-cns-demo
+Demo of Openshift Container Platform (OCP) and Container Native Storage (CNS)
 
 # About this project
 
@@ -28,6 +28,10 @@ bootstrap tries to help you do this by:
 * link/copy the current users `~/.ssh/` into the container
 * run `ssh-agent` as the starting shell
 * allow you to `ssh-add` your key (if it's not the default `~/.ssh/id_rsa`
+
+# Layout of the demo
+
+[Checkout the Layout directory for more information](./layout/)
 
 # Usage
 

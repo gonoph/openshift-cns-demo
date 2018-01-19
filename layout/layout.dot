@@ -1,0 +1,17 @@
+// vim: sw=4 ts=4 ai expandtab
+digraph G {
+    node [style=filled];
+
+    Internet;
+
+    subgraph cluster_Ansible {
+        label = "Ansible Host";
+        Ansible -> Internet;
+    }
+
+    subgraph cluster_EC2 {
+        label = "EC2";
+        Internet -> {dns master node1 node2};
+    }
+
+}
