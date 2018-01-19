@@ -18,11 +18,24 @@ small EC2 or lightsail instance on AWS that I use for the installs.
 
 [Look at the bootstrap directory for more information](./bootstrap/)
 
+# Understanding AWS and Ansible
+
+Ansible will expect to be able to log into your EC2 instances. The easiest way
+to do this is to use the same SSH key you use to create the EC2 instances as
+the same SSH key you use for Ansible. The supplied Docker image in the
+bootstrap tries to help you do this by:
+
+* link/copy the current users ~/.ssh/ into the container
+* run `ssh-agent` as the starting shell
+* allow you to `ssh-add` your key (if it's not the default `~/.ssh/id_rsa`
+
 # Usage
 
 Everything should work out if you use the `Makefile`.
 
 ```base
+# optional 
+ssh-add ~/.ssh/id_rsa.ansible
 # edit variables
 vi inventory/demo
 make help
