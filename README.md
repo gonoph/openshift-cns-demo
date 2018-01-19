@@ -31,6 +31,19 @@ bootstrap tries to help you do this by:
 
 # Usage
 
+Clone this repository:
+```bash
+git clone --recursive http://github.com/gonoph/openshift-cns-demo.git
+cd openshift-cns-demo
+```
+
+Optionally, then build and run the included docker bootstrap image:
+
+```bash
+cd bootstrap
+make
+make run
+```
 Everything should work out if you use the `Makefile`.
 
 ```base
@@ -47,13 +60,20 @@ make all
 1. `ansible_user` - the initial `ansible_user` for the VMs (ec2 is normally NOT root).
 2. `private_ip_start` - the start address for the hosts in the ec2 group (so we
    can have static addresses across boots).
-3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2 VMs
+3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2
+   VMs. The playbook will automatically include the current host upon which
+   ansible is run.
 4. `ec2_ami_image` - the EC2 ami image, currently using the Fedora 27 Atomic
    image, you may need to update it.
 5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs
    t2.micro, and the OCP VMs use m4.large
+6. `ec2_vpc_id` - *optional* this is the vpc you want your instance to run.
+   If you only have **ONE** VPC in your AWS region, then you can leave this
+   blank. Otherwise, you will need to define this.
+7. `ec2_vpc_subnet` - *optional* playbook will select the **FIRST** subnet it
+   finds in the VPC, unless you define it here.
 6. `storage_routes` - This is used to add entries to the hosts file. It's most
-   useful without dns, and running in the bootstrap container.
+   useful without custom dns, and running in the bootstrap container.
 
 # Explaination of playbooks
 
