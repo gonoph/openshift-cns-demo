@@ -18,16 +18,29 @@
   tags: [ post ]
   tasks:
     - name: add admin user as cluster admin
-      command: oc adm policy add-cluster-role-to-user cluster-admin admin
+      become: true
+      run_once: true
+      command: /usr/local/bin/oc adm policy add-cluster-role-to-user cluster-admin admin
 
     - name: copy ca.crt to localhost
+      become: true
       run_once: true
       fetch:
         src: /etc/origin/master/ca.crt
-        dest: /etc/pki/ca-trust/source/anchors/ocp-ca.crt
+        dest: /tmp/ocp-ca.crt
         flat: yes
 
+    - name: move ocp-ca.crt into ca-trusts
+      become: true
+      run_once: true
+      connection: local
+      register: move_ca
+      copy:
+        src: /tmp/ocp-ca.crt
+        dest: /etc/pki/ca-trust/source/anchors/ocp-ca.crt
+
     - name: update ca trusts
+      when: move_ca.changed
       connection: local
       become: true
       run_once: true
@@ -38,3 +51,17 @@
       run_once: true
       # command: "/usr/bin/oc login --certificate-authority=/etc/pki/ca-trust/source/anchors/ocp-ca.crt https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
       command: "/usr/bin/oc login https://{{ groups.masters | first }}:8443 -u admin -p adminuser123"
+
+    - name: remote copy admin config from root
+      when: ansible_user != 'root'
+      become: true
+      command: "/usr/bin/cp -ar /root/.kube/ {{ ansible_user_dir }}/.kube/"
+
+    - name: remote set permissions on config
+      when: ansible_user != 'root'
+      become: true
+      file:
+        recurse: true
+        group: "{{ ansible_user_id }}"
+        owner: "{{ ansible_user_id }}"
+        path: "{{ ansible_user_dir }}/.kube/"

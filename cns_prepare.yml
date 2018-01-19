@@ -53,57 +53,15 @@
       changed_when: false
       command: /usr/bin/oc adm policy add-scc-to-user privileged system:serviceaccount:storage:default
 
-    - name: create template for gluster endpoints
-      connection: local
-      run_once: true
-      template:
-        src: gluster-cluster.yml.j2
-        dest: /tmp/gluster-cluster.yml
-
-    - name: import gluster endpoints
-      connection: local
-      run_once: true
-      register: oc_out
-      failed_when: "oc_out.rc != 0 and 'AlreadyExists' not in oc_out.stderr"
-      changed_when: oc_out.rc == 0 
-      command: /usr/bin/oc create -f /tmp/gluster-cluster.yml
-
-    - name: determine clusterid
-      connection: local
-      run_once: true
-      uri:
-        url: "http://heketi-storage.{{ openshift_master_default_subdomain }}/clusters"
-        return_content: true
-      register: clusterid_out
-
-    - name: set clusterid
-      connection: local
-      run_once: true
-      set_fact:
-        heketi_clusterid: "{{ clusterid_out.json.clusters | first }}"
-
-    - name: write out storageclass file
-      connection: local
-      run_once: true
-      template:
-        src: cns-storageclass.yml.j2
-        dest: /tmp/cns-storageclass.yml
-
-    - name: import storagelcass
-      connection: local
-      run_once: true
-      register: oc_out
-      failed_when: "oc_out.rc != 0 and 'AlreadyExists' not in oc_out.stderr"
-      changed_when: oc_out.rc == 0 
-      command: /usr/bin/oc create -f /tmp/cns-storageclass.yml
-
     - name: remove firewall rule for gluster
+      become: true
       lineinfile:
         path: /etc/sysconfig/iptables
         state: absent
         regexp: "^-A INPUT -j REJECT --reject-with icmp-host-prohibited"
 
     - name: remove runtime firewall rule
+      become: true
       command: /usr/sbin/iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
       register: iptables_out
       failed_when: "iptables_out.rc != 0 and 'iptables: No chain/target/match by that name.' not in iptables_out.stderr_lines"
