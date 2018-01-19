@@ -71,7 +71,7 @@ make all
 3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2
    VMs. The playbook will automatically include the current host upon which
    ansible is run.
-4. `ec2_ami_image` - the EC2 ami image, currently using the Fedora 27 Atomic
+4. `ec2_ami_image` - the EC2 ami image, currently using the RHEL 7.4 Atomic
    image, you may need to update it.
 5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs
    t2.micro, and the OCP VMs use m4.large
