@@ -6,8 +6,16 @@ DOCKER_LABEL?=localhost/ocp-installer:latest
 
 all: build
 
+TEST_NEEDS_SUDO:=$(shell docker ps > /dev/null 2>&1 && echo no || echo yes)
+
+ifeq ($(TEST_NEEDS_SUDO),yes)
+SUDO:=sudo
+else
+SUDO:=
+endif
+
 build: $(DOCKERFILE)
-	docker build -t $(DOCKER_LABEL) -f $(DOCKERFILE) .
+	$(SUDO) docker build -t $(DOCKER_LABEL) -f $(DOCKERFILE) .
 
 GID=$(shell id -g)
 UID=$(shell id -u)
@@ -26,7 +34,7 @@ run: $(DOCKERFILE)
 	err() { echo "$$@" >&2; exit 1; }
 	V="-v $(MAKEFILE_DIR)/..:/tmp/install:Z"
 	test -r $(MAKEFILE_DIR)/aws && cp $(MAKEFILE_DIR)/aws $$T && V+=" -v $$T/aws:/etc/profile.d/aws.sh:Z"
-	D_HOME=`docker run --rm -i $(DOCKER_LABEL) /bin/sh -c 'echo $$HOME'`
+	D_HOME=`$(SUDO) docker run --rm -i $(DOCKER_LABEL) /bin/sh -c 'echo $$HOME'`
 	test -z "$$D_HOME" && err 'Unable to determine docker container HOME directory'
 	V+=" -v $$T/.ssh:$$D_HOME/.ssh:Z"
-	docker run --name=ocp-installer --rm -it $$V $(DOCKER_LABEL)
+	$(SUDO) docker run --name=ocp-installer --rm -it $$V $(DOCKER_LABEL)
