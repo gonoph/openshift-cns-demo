@@ -16,7 +16,7 @@ There's a docker image under `/bootstrap` that you can use to create an install
 environment. Since this demo is designed to run on AWS, I typically have a
 small EC2 or lightsail instance on AWS that I use for the installs.
 
-[Look at the bootstrap directory for more information][./bootstrap/]
+[Look at the bootstrap directory for more information](./bootstrap/)
 
 # Usage
 
