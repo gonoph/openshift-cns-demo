@@ -25,6 +25,8 @@ To run the bootstrap:
 ```bash
 cd bootstrap
 make
+# so you can disconnect and come back later
+screen -S bootstrap
 make run
 ```
 # Usage playbooks
