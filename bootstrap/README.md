@@ -2,6 +2,8 @@
 
 This image is designed to be fully able to run the playbooks for this demo.
 
+Check out [what's needed to build the image.][NEEDED.md]
+
 It uses the following environment varibles:
 
 - `AWS_ACCESS_KEY` for your access key into AWS
