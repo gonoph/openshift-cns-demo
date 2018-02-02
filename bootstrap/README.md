@@ -27,16 +27,16 @@ make run
 ```
 # Usage playbooks
 
-You should just need to run `site.yml` to configure the ec2 instances, install OCP, then prepare them for CNS.
-
-There's a handy script to help:
+After you're in the bootstrap container, you should just need to run make. It
+has the proper order defined, and will prevent you from running playbooks that
+already finished properly.
 
 ```bash
-./install
+make all
 ```
 
 And when you're done:
 
 ```bash
-./clean.sh
+make clean
 ```
