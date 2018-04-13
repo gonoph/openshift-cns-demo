@@ -2,7 +2,3 @@
 	path = openshift-ansible
 	url = https://github.com/openshift/openshift-ansible.git
 	branch = release-3.6
-[submodule "gluster-kubernetes"]
-	path = gluster-kubernetes
-	url = https://github.com/gluster/gluster-kubernetes.git
-	branch = v1.2.0
