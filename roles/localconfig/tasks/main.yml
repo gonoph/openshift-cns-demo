@@ -51,6 +51,7 @@
       {% for hn in groups.OSEv3 %}
       {%   if hostvars[hn].public_ip | default('') | length > 0 %}
       {%     set routes = '' if hn not in groups.masters else storage_routes %}
-      {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }}
+      {%     set cluster = '' if hn not in groups.dns else openshift_master_cluster_public_hostname | default('') %}
+      {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }} {{ cluster }}
       {%   endif %}
       {% endfor %}

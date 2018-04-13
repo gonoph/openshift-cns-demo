@@ -60,6 +60,7 @@
       {% endfor %}
   notify:
     - refresh facts
+    - restart dnsmasq
 
 - meta: flush_handlers
 
