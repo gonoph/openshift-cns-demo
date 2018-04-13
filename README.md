@@ -93,9 +93,6 @@ make all
 4. `ocp.yml`: playbook to read in EC2 instances and then run the OCP install playbook.
 5.  `post_config.yml`: playbook to post-configure the OCP instance by adding an
     admin user, copying the ca.crt, and log in.
-6. `cns_prepare.yml`: playbook to prepare OCP to run the CNS deployment script.
-6. `cns_post.yml`: playbook to add a storage class and prepare OCP to run the
-   CNS deployment script.
 
 The inventory is in `inventory/demo` and it contains all the hosts for the
 demo, currently configured for AWS EC2 with one small dns VM, ond 3 4 core VMs
