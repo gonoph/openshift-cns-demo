@@ -115,7 +115,7 @@ master[1:3].example.com
 master[1:3].example.com
 
 [nodes]
-master[1:3].example.com
+master[1:3].example.com openshift_node_labels="{'region': 'infra', 'zone': 'default', 'openshift-infra': 'apiserver'}"
 # node[1:2].example.com
 
 [glusterfs]
