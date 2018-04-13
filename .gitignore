@@ -3,7 +3,7 @@
 bootstrap/Dockerfile
 *.retry
 bootstrap/aws
-bootstrap/motd
+bootstrap/files/etc/motd
 .*.swp
 .flag-*
 # Byte-compiled / optimized / DLL files

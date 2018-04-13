@@ -9,7 +9,9 @@ RUN     yum update -y \
 	git \
 	httpd-tools \
 	java-1.8.0-openjdk-headless \
+	jq \
 	origin-clients \
+	procps-ng \
 	python2-passlib \
 	python2-pip \
 	python3.x86_64 \
@@ -28,8 +30,6 @@ RUN     yum update -y \
         && useradd -u $BUILD_UID -g $BUILD_GID ansible -G wheel \
         && echo 'ansible  ALL=(ALL)       NOPASSWD: ALL' > /etc/sudoers.d/ansible_conf
 WORKDIR	/tmp/install
-COPY	motd /etc/motd
-RUN	echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' > /etc/profile.d/motd.sh \
-	&& echo 'test -z "$AWS_ACCESS_KEY" -o -z "$AWS_SECRET_KEY" && echo AWS_ACCESS_KEY and AWS_SECRET_KEY must be defined >&2 && exit 1' > /etc/profile.d/check_aws.sh
+COPY	files /
 USER    ansible
 CMD [ "/usr/bin/bash" ]
