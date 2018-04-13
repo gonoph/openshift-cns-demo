@@ -8,3 +8,9 @@
     # delay: 10
     timeout: 320
     state: started
+
+- name: pausing 10 seconds to ensure ssh accepts connection (intermittent)
+  pause:
+    seconds: 10
+  listen: Wait for SSH to come up
+
