@@ -51,7 +51,8 @@ listen lb_router_ssl
     # option              ssl-hello-chk
 
     balance source
-{% for hn in groups.masters %}
+{% set groups_infra = groups.nodes | map('extract', hostvars) | list | json_query('[*].{name: inventory_hostname, region: openshift_node_labels.region} | [?region==`infra`].name') %}
+{% for hn in groups_infra %}
 {% if 'internal_ip' in hostvars[hn] %}
     server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:443 check
 {% endif %}
@@ -65,7 +66,7 @@ listen lb_router_http
     # option              ssl-hello-chk
 
     balance source
-{% for hn in groups.masters %}
+{% for hn in groups_infra %}
 {% if 'internal_ip' in hostvars[hn] %}
     server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:80 check
 {% endif %}
