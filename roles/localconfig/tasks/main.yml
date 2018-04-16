@@ -49,9 +49,9 @@
     state: "{{ 'absent' if sshconfig_clean is defined else 'present' }}"
     path: /etc/hosts
     block: |
-      {% for hn in groups.OSEv3 %}
+      {% for hn in groups.all %}
       {%   if hostvars[hn].public_ip | default('') | length > 0 %}
-      {%     set routes = '' if hn not in groups.masters else storage_routes %}
+      {%     set routes = '' if hn not in groups.dns else storage_routes %}
       {%     set cluster = '' if hn not in groups.dns else openshift_master_cluster_public_hostname | default('') %}
       {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }} {{ cluster }}
       {%   endif %}
