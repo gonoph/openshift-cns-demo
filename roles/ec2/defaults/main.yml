@@ -6,10 +6,11 @@ ec2_destroy: false
 ec2_api_getip_key: UoXQYn71TN8yahIOgHPgt95CjtHzcBJacrlKjhJ5
 ec2_api_getip_url: https://5wvzlz5jfh.execute-api.us-east-1.amazonaws.com/Prod
 
-ec2_drive_map:
+default_ec2_drive_map:
   - /dev/sda1
   - /dev/xvdb
   - /dev/xvdc
+ec2_drive_map: "{{ default_ec2_drive_map }}"
 
 ec2_tags:
   Name: '{{ inventory_hostname }}'
@@ -29,16 +30,17 @@ ec2_security_group_tags:
 ec2_public_ip: True
 ec2_wait: 300
 ec2_region: us-east-1
-ec2_volumes:
+default_ec2_volumes:
   - delete_on_termination: true
     device_name: '{{ ec2_drive_map.0 }}'
     volume_size: 20
     volume_type: gp2
   - delete_on_termination: true
     device_name: '{{ ec2_drive_map.1 }}'
-    volume_size: 10
+    volume_size: 20
     volume_type: gp2
   - delete_on_termination: true
     device_name: '{{ ec2_drive_map.2 }}'
     volume_size: 20
     volume_type: gp2
+ec2_volumes: "{{ default_ec2_volumes }}"
