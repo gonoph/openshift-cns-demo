@@ -8,7 +8,7 @@
   tags: [ rhel, rhel_hostname ]
 
 - include_tasks: subscription.yml
-  when: "ansible_distribution == 'Red Hat Enterprise Linux'"
+  when: "ansible_distribution == 'RedHat'"
   tags: [ rhel, rhel_subscription ]
 
 - include_tasks: services.yml
