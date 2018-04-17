@@ -6,6 +6,8 @@ bootstrap/aws
 bootstrap/files/etc/motd
 .*.swp
 .flag-*
+inventory/demo.ocp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

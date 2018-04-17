@@ -1,21 +1,23 @@
 ; vim: filetype=dosini
-[rhel:vars]
+[all:vars]
 # ansible_user=ec2-user
-ansible_user=cloud-user
-private_ip_start=10
-private_ip={{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}
-rhel_extras_repo=rhui-REGION-rhel-server-extras
-
-[ocp:vars]
-# ec2_instance_type=m4.large
-ec2_instance_type=t2.medium
-
-[dns:vars]
-ec2_instance_type=t2.micro
-ec2_volumes='[{"volume_size": 10, "delete_on_termination": true, "volume_type": "gp2", "device_name": "{{ ec2_drive_map.0 }}"}]'
-docker_storage_dev=''
 
 [ec2:vars]
+ansible_user=cloud-user
+private_ip_start=10
+private_ip="{{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}"
+rhel_extras_repo=rhui-REGION-rhel-server-extras
+ocp_domain="{{ public_ip }}.nip.io"
+ocp_app_domain="apps.{{ ocp_domain }}"
+ocp_hostname="ocp.{{ ocp_domain }}"
+hostname="{{ inventory_hostname }}.{{ocp_domain}}"
+
+openshift_release=3.7
+openshift_image_tag=v3.7.2
+
+# ec2_instance_type=m4.large
+ec2_instance_type=t2.medium
+ec2_image_user=cloud-user
 # the following is RHEL Atomic 7.4 in us-east-1 via Cloud Access (recommended)
 ec2_ami_image=ami-68ee1915
 # the following is RHEL 7.4 in us-east-1 via Cloud Access
@@ -25,102 +27,19 @@ ec2_mynetworks=[ '108.247.233.239/32' ]
 # if you only have one VPC, then it will be selected, otherwise, define it here
 # ec2_vpc_id=vpc-fffffff
 
+[ec2]
+dns1 ec2_volumes='{{ default_ec2_volumes[0:1] }}' docker_storage_dev='' ec2_instance_type=t2.micro
+master[1:3] ec2_volumes='{{ default_ec2_volumes }}' storage_devices='[ "/dev/xvdc" ]'
+node[1:3] ec2_volumes='{{ default_ec2_volumes[0:2] }}'
+
 [dns]
-dns.example.com ec2_volumes="{{ default_ec2_volumes[0:1] }}"
-
-[ocp]
-master[1:3].example.com ec2_volumes="{{ default_ec2_volumes }}"
-node[1:3].example.com ec2_volumes="{{ default_ec2_volumes[0:2] }}"
-
-[storage:vars]
-storage_device=/dev/xvdc
-storage_routes="heketi-storage-{{openshift_storage_glusterfs_namespace}}.{{openshift_master_default_subdomain}}"
-
-[storage]
-master[1:3].example.com
-
-[rhel:children]
-ec2
-
-[ec2:children]
-ocp
-dns
-
-[OSEv3:children]
-nodes
-masters
-etcd
-rhel
-glusterfs
-glusterfs_registry
-# lb
-
-[OSEv3:vars]
-openshift_release=3.7
-openshift_image_tag=v3.7.2
-openshift_deployment_type=origin
-openshift_disable_check=memory_availability,disk_availability
-containerized=True
-openshift_hostname={{ inventory_hostname }}
-
-# will test this later
-# openshift_cloudprovider_kind=aws
-# openshift_cloudprovider_aws_access_key={{ aws_access_key }}
-# openshift_cloudprovider_aws_secret_key={{ aws_secret_key }}
-# if defning the above, then comment out below
-openshift_master_ingress_ip_network_cidr=172.250.0.0/16
-
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-# admin: adminuser123
-# demo: demouser123
-openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
-
-openshift_master_cluster_method=native
-openshift_master_cluster_hostname=ocp.example.com
-openshift_master_cluster_public_hostname=ocp.example.com
-openshift_master_default_subdomain=apps.example.com
-
-openshift_clock_enabled=True
-
-openshift_metrics_install_metrics=true
-openshift_metrics_image_version=v{{ openshift_release }}
-
-openshift_service_catalog_image_version=v{{ openshift_release }}
-
-openshift_logging_install_logging=false
-# openshift_hosted_logging_hostname=kibana.apps.example.com
-openshift_logging_kibana_hostname=kibana.apps.example.com
-openshift_master_logging_public_url=https://kibana.apps.example.com
-openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.example.com/hawkular/metrics
-# openshift_logging_kibana_proxy_debug=True
-
-ansible_service_broker_image_version=v{{ openshift_release }}
-openshift_template_service_broker_namespaces=['openshift']
-
-openshift_schedulable=True
-openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-openshift_ip={{ internal_ip }}
-openshift_public_ip={{ ansible_host }}
-
-openshift_storage_glusterfs_namespace=glusterfs
-openshift_storage_glusterfs_storageclass_default=True
-
-# XXX don't really need this
-# openshift_dns_ip=172.200.0.1
-openshift_portal_net=172.200.0.0/16
+dns1
 
 [masters]
-master[1:3].example.com
-
-[etcd]
-master[1:3].example.com
+master[1:3]
 
 [nodes]
-master[1:3].example.com openshift_node_labels="{'region': 'master', 'zone': 'default', 'openshift-infra': 'apiserver'}" openshift_schedulable=False
-node[1:3].example.com openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+node[1:3]
 
-[glusterfs]
-master[1:3].example.com glusterfs_devices='["/dev/xvdc"]'
-
-[glusterfs_registry]
-master[1:3].example.com glusterfs_devices='["/dev/xvdc"]'
+[storage]
+master[1:3]

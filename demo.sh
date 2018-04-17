@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec ansible-playbook -i inventory/demo "$@"
+exec ansible-playbook -i inventory/demo.ocp "$@"

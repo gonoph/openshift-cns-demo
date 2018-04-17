@@ -13,6 +13,9 @@ PLAYBOOK_CONFIG:=config.yml
 PLAYBOOK_OCP:=ocp.yml
 PLAYBOOK_POST:=post_config.yml
 
+EC2_INVENTORY:=inventory/demo
+OCP_INVENTORY:=inventory/demo.ocp
+
 PLAYBOOKS:=$(PLAYBOOK_CLEAN) $(PLAYBOOK_CREATE) $(PLAYBOOK_CONFIG) $(PLAYBOOK_OCP) $(PLAYBOOK_POST)
 PLAYBOOK_flags:=$(FLAG_CREATE) $(FLAG_CONFIG) $(FLAG_OCP) $(FLAG_POST)
 
@@ -35,10 +38,10 @@ all: create config ocp post test
 clean: $(PLAYBOOK_CLEAN)
 	$(DEBUG) ./demo.sh $<
 	rm -f .flag-* *.retry
-create: $(FLAG_CREATE)
-config: create $(FLAG_CONFIG)
-ocp: config $(FLAG_OCP)
-post: ocp  $(FLAG_POST)
+create: $(EC2_INVENTORY) $(FLAG_CREATE)
+config: create $(OCP_INVENTORY) $(FLAG_CONFIG)
+ocp: config $(OCP_INVENTORY) $(FLAG_OCP)
+post: ocp  $(OCP_INVENTORY) $(FLAG_POST)
 test: post
 	$(DEBUG) ./$(SCRIPT_TEST) test
 

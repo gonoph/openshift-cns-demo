@@ -1,9 +1,6 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
 
-- include_tasks: root_login.yml
-  tags: [ rhel, rhel_root ]
-
 - include_tasks: hostname.yml
   tags: [ rhel, rhel_hostname ]
 

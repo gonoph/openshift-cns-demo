@@ -1,0 +1,9 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: dynamically create OCP inventory
+  run_once: true
+  connection: local
+  template:
+    src: demo.ocp.j2
+    dest: inventory/demo.ocp
