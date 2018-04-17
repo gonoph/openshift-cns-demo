@@ -36,10 +36,8 @@
 - name: point dns locally
   command: "/usr/bin/nmcli c modify '{{ out_profile.uuid }}' -ipv4.dns '' ipv4.dns {{ dns_ip }} ipv4.ignore-auto-dns yes"
   when: |
-    inventory_hostname not in groups.dns and
-    dns_ip | length > 0 and
-    dns_ip not in out_resolv.dns and
-    not out_resolv['ignore-auto-dns']
+    ( inventory_hostname not in groups.dns and dns_ip | length > 0 and dns_ip not in out_resolv.dns )
+    or not out_resolv['ignore-auto-dns']
   notify: restart network
 
 - name: ensure network restarted
