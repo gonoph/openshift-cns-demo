@@ -88,15 +88,14 @@ openshift_metrics_image_version=v{{ openshift_release }}
 openshift_service_catalog_image_version=v{{ openshift_release }}
 
 openshift_logging_install_logging=false
-
-# openshift_logging_kibana_proxy_debug=True
-ansible_service_broker_image_version=v{{ openshift_release }}
-openshift_template_service_broker_namespaces=['openshift']
-
 # openshift_hosted_logging_hostname=kibana.apps.example.com
 openshift_logging_kibana_hostname=kibana.apps.example.com
 openshift_master_logging_public_url=https://kibana.apps.example.com
 openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.example.com/hawkular/metrics
+# openshift_logging_kibana_proxy_debug=True
+
+ansible_service_broker_image_version=v{{ openshift_release }}
+openshift_template_service_broker_namespaces=['openshift']
 
 openshift_schedulable=True
 openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
@@ -104,6 +103,7 @@ openshift_ip={{ internal_ip }}
 openshift_public_ip={{ ansible_host }}
 
 openshift_storage_glusterfs_namespace=glusterfs
+openshift_storage_glusterfs_storageclass_default=True
 
 # XXX don't really need this
 # openshift_dns_ip=172.200.0.1
