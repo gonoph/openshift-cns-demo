@@ -3,20 +3,22 @@
 nodes
 masters
 etcd
-rhel
 glusterfs
-glusterfs_registry
+# glusterfs_registry
+dns
 # lb
 
-[OSEv3:vars]
+[all:vars]
 ansible_user=root
+
+[OSEv3:vars]
 openshift_release={{ openshift_release }}
 openshift_image_tag={{ openshift_image_tag }}
 openshift_deployment_type=origin
 openshift_disable_check=memory_availability,disk_availability
 containerized=True
 {% raw %}
-openshift_hostname="{{ inventory_hostname  }}"
+openshift_hostname={{ inventory_hostname  }}
 {% endraw %}
 
 # will test this later
@@ -31,9 +33,15 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # demo: demouser123
 openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
 
+{% if groups.masters | length > 1 %}
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=ocp.{{ ocp_domain }}
 openshift_master_cluster_public_hostname={{ ocp_hostname }} 
+{% else %}
+# openshift_master_cluster_method=native
+# openshift_master_cluster_hostname=ocp.{{ ocp_domain }}
+# openshift_master_cluster_public_hostname={{ ocp_hostname }} 
+{% endif %}
 openshift_master_default_subdomain={{ ocp_app_domain }}
 
 openshift_clock_enabled=True
@@ -54,17 +62,26 @@ ansible_service_broker_image_version=v{{ openshift_release }}
 openshift_template_service_broker_namespaces=['openshift']
 
 openshift_schedulable=True
-openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+openshift_node_labels={'region': 'infra', 'zone': 'default'}
 
 openshift_storage_glusterfs_storageclass_default=True
+{% raw %}
+openshift_ip={{ internal_ip }}
+openshift_public_ip={{ public_ip }}
+{% endraw %}
 
 # XXX don't really need this
 # openshift_dns_ip=172.200.0.1
 openshift_portal_net=172.200.0.0/16
 
+[dns]
+{% for node in groups.dns %}
+{{ hostvars[node].hostname }} docker_storage_dev='' internal_ip={{ hostvars[node].internal_ip }} public_ip={{ hostvars[node].public_ip }}
+{% endfor %}
+
 [masters]
 {% for master in groups.masters %}
-{{ hostvars[master].hostname }} openshift_ip={{ hostvars[master].internal_ip }} openshift_public_ip={{ hostvars[master].ansible_host }}
+{{ hostvars[master].hostname }} internal_ip={{ hostvars[master].internal_ip }} public_ip={{ hostvars[master].ansible_host }}
 {% endfor %}
 
 [etcd]
@@ -77,7 +94,7 @@ openshift_portal_net=172.200.0.0/16
 {% if node in groups.masters %}
 {{ hostvars[node].hostname }} openshift_node_labels="{'region': 'master', 'zone': 'default', 'openshift-infra': 'apiserver'}" openshift_schedulable=False
 {% else %}
-{{ hostvars[node].hostname }} openshift_ip={{ hostvars[node].internal_ip }} openshift_public_ip={{ hostvars[node].ansible_host }}
+{{ hostvars[node].hostname }} internal_ip={{ hostvars[node].internal_ip }} public_ip={{ hostvars[node].ansible_host }}
 {% endif %}
 {% endfor %}
 

@@ -35,8 +35,12 @@ help:
 	@echo "   test:     test that Storage is working"
 
 all: create config ocp post test
+
+clean create: INVENTORY_FILE=$(EC2_INVENTORY)
+config ocp post test: INVENTORY_FILE=$(OCP_INVENTORY)
+
 clean: $(PLAYBOOK_CLEAN)
-	$(DEBUG) ./demo.sh $<
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) $<
 	rm -f .flag-* *.retry
 create: $(EC2_INVENTORY) $(FLAG_CREATE)
 config: create $(OCP_INVENTORY) $(FLAG_CONFIG)
@@ -45,11 +49,11 @@ post: ocp  $(OCP_INVENTORY) $(FLAG_POST)
 test: post
 	$(DEBUG) ./$(SCRIPT_TEST) test
 
-$(FLAG_CREATE): $(PLAYBOOK_CREATE) Makefile $(CREATE_DEPS)
-$(FLAG_CONFIG): $(PLAYBOOK_CONFIG) Makefile
-$(FLAG_OCP): $(PLAYBOOK_OCP) Makefile
-$(FLAG_POST): $(PLAYBOOK_POST) Makefile
+$(FLAG_CREATE): $(PLAYBOOK_CREATE) $(EC2_INVENTORY) Makefile $(CREATE_DEPS)
+$(FLAG_CONFIG): $(PLAYBOOK_CONFIG) $(OCP_INVENTORY) Makefile
+$(FLAG_OCP): $(PLAYBOOK_OCP) $(OCP_INVENTORY) Makefile
+$(FLAG_POST): $(PLAYBOOK_POST) $(OCP_INVENTORY) Makefile
 
 $(PLAYBOOK_flags):
-	$(DEBUG) ./demo.sh $<
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) $<
 	touch $@

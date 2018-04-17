@@ -28,7 +28,7 @@ ec2_mynetworks=[ '108.247.233.239/32' ]
 # ec2_vpc_id=vpc-fffffff
 
 [ec2]
-dns1 ec2_volumes='{{ default_ec2_volumes[0:1] }}' docker_storage_dev='' ec2_instance_type=t2.micro
+dns1 ec2_volumes='{{ default_ec2_volumes[0:1] }}' ec2_instance_type=t2.micro
 master[1:3] ec2_volumes='{{ default_ec2_volumes }}' storage_devices='[ "/dev/xvdc" ]'
 node[1:3] ec2_volumes='{{ default_ec2_volumes[0:2] }}'
 
@@ -39,6 +39,7 @@ dns1
 master[1:3]
 
 [nodes]
+master[1:3]
 node[1:3]
 
 [storage]

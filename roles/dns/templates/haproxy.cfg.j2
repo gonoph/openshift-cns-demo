@@ -38,9 +38,7 @@ listen lb_ocp
 
     balance source
 {% for hn in groups.masters %}
-{% if 'internal_ip' in hostvars[hn] %}
     server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:8443 check
-{% endif %}
 {% endfor %}
 
 listen lb_router_ssl
@@ -53,9 +51,7 @@ listen lb_router_ssl
     balance source
 {% set groups_infra = groups.nodes | map('extract', hostvars) | list | json_query('[*].{name: inventory_hostname, region: openshift_node_labels.region} | [?region==`infra`].name') %}
 {% for hn in groups_infra %}
-{% if 'internal_ip' in hostvars[hn] %}
     server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:443 check
-{% endif %}
 {% endfor %}
 
 listen lb_router_http

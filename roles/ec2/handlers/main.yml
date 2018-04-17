@@ -9,8 +9,12 @@
     timeout: 320
     state: started
 
-- name: pausing 10 seconds to ensure ssh accepts connection (intermittent)
-  pause:
-    seconds: 10
+- name: ensuring hosts are up
+  ping:
+  register: ping
+  until: ping.rc == 0
+  retries: 10
+  delay: 1
+  ignore_errors: no
   listen: Wait for SSH to come up
 
