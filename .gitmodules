@@ -1,4 +1,8 @@
 [submodule "openshift-ansible"]
 	path = openshift-ansible
 	url = https://github.com/openshift/openshift-ansible.git
-	branch = release-3.6
+	branch = openshift-ansible-3.7.44-1
+[submodule "easy-rsa"]
+	path = easy-rsa
+	url = ./easy-rsa
+	branch = v3.0.5
