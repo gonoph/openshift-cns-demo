@@ -12,9 +12,13 @@
 - name: ensuring hosts are up
   ping:
   register: ping
-  until: ping.rc == 0
+  until: ping is success
   retries: 10
   delay: 1
   ignore_errors: no
   listen: Wait for SSH to come up
 
+- name: pausing 15 secs to let network settle
+  pause:
+    seconds: 15
+  listen: Wait for SSH to come up
