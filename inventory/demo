@@ -1,25 +1,35 @@
 ; vim: filetype=dosini
-[all:vars]
-# ansible_user=ec2-user
 
 [ec2:vars]
 ansible_user=cloud-user
 private_ip_start=10
 private_ip="{{ ec2_vpc_subnet_cidr_block | ipaddr(private_ip_start + groups['ec2'].index(inventory_hostname)) | ipaddr('address') }}"
 rhel_extras_repo=rhui-REGION-rhel-server-extras
-ocp_domain="{{ public_ip }}.nip.io"
+ocp_domain="{{ hostvars[groups.dns | first ].public_ip }}.nip.io"
 ocp_app_domain="apps.{{ ocp_domain }}"
 ocp_hostname="ocp.{{ ocp_domain }}"
-hostname="{{ inventory_hostname }}.{{ocp_domain}}"
+hostname="{{ inventory_hostname }}.{{public_ip}}.nip.io"
 
 openshift_release=3.7
-openshift_image_tag=v3.7.2
+openshift_image_tag=v3.7.42-2
+openshift_deployment_type=openshift-enterprise
+
+# Customer CA Certificate
+# It's assumed you have a company CA
+# - ca.crt - Company CA
+# - ocp-ca-bundle.crt - Company CA + OCP CA
+# - ocp-ca-bundle-key - OCP CA Key
+# - {{ ocp_app_domain}.crt - default wildcard certificate for router, signed by Company CA
+# - {{ ocp_app_domain}.key - default wildcard certificate for router - key
+openshift_master_ca_certificate={'certfile': '/tmp/pki/ocp-ca-bundle.crt', 'keyfile': '/tmp/pki/ocp-ca-bundle.key'}
+# openshift_hosted_router_certificate={"certfile": "/tmp/pki/router.crt", "keyfile": "/tmp/pki/router.key", "cafile": "/tmp/pki/ca.crt"}
 
 # ec2_instance_type=m4.large
 ec2_instance_type=t2.medium
-ec2_image_user=cloud-user
-# the following is RHEL Atomic 7.4 in us-east-1 via Cloud Access (recommended)
-ec2_ami_image=ami-68ee1915
+# the following is RHEL Atomic 7.4.5 in us-east-1 via Cloud Access (not recommended)
+# ec2_ami_image=ami-68ee1915
+# the following is RHEL Atomic 7.4.4 in us-east-1 via Cloud Access (recommended)
+ec2_ami_image=ami-d97120a3
 # the following is RHEL 7.4 in us-east-1 via Cloud Access
 ec2_mynetworks=[ '108.247.233.239/32' ]
 # subnet will be picked from 1st subnet found in VPC if not defined
