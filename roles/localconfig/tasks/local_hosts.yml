@@ -6,7 +6,7 @@
   run_once: true
   blockinfile:
     unsafe_writes: true
-    state: "{{ 'absent' if sshconfig_clean is defined else 'present' }}"
+    state: "{{ sshconfig_clean | ternary('absent', 'present') }}"
     path: /etc/hosts
     block: |
       {% for hn in groups.all | sort %}

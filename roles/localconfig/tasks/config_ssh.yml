@@ -16,7 +16,7 @@
     force: false
 
 - name: removing from ssh config
-  when: sshconfig_clean is defined
+  when: sshconfig_clean
   run_once: true
   blockinfile:
     marker: "# {mark} OCP-DEMO MANAGED BLOCK"
@@ -24,7 +24,7 @@
     state: absent
 
 - name: adding to ssh config
-  when: sshconfig_clean is not defined
+  when: not sshconfig_clean
   run_once: true
   blockinfile:
     marker: "# {mark} OCP-DEMO MANAGED BLOCK"
@@ -32,7 +32,7 @@
     block: |
       {% for hn in play_hosts %}
       {% if hostvars[hn].public_ip | default('') | length > 0 %}
-      Host {{ hn }} {{ hostname }} {{ hostvars[hn].public_ip }} {{ hostvars[hn].internal_ip }}
+      Host {{ hn }} {{ hostvars[hn].hostname }} {{ hostvars[hn].public_ip }} {{ hostvars[hn].internal_ip }}
         Hostname {{ hostvars[hn].public_ip }}
         UserKnownHostsFile /dev/null
         StrictHostKeyChecking no

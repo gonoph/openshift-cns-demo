@@ -4,7 +4,7 @@ nodes
 masters
 etcd
 glusterfs
-# glusterfs_registry
+glusterfs_registry
 dns
 # lb
 
@@ -14,7 +14,7 @@ ansible_user=root
 [OSEv3:vars]
 openshift_release={{ openshift_release }}
 openshift_image_tag={{ openshift_image_tag }}
-openshift_deployment_type=origin
+openshift_deployment_type={{ openshift_deployment_type }}
 openshift_disable_check=memory_availability,disk_availability
 containerized=True
 {% raw %}
@@ -32,6 +32,13 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # admin: adminuser123
 # demo: demouser123
 openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
+
+{% if openshift_master_ca_certificate is defined %}
+openshift_master_ca_certificate={{ openshift_master_ca_certificate | to_json | replace('"', "'") }}
+{% endif %}
+{% if openshift_hosted_router_certificate is defined %}
+openshift_hosted_router_certificate={{ openshift_hosted_router_certificate | to_json | replace('"', "'") }}
+{% endif %}
 
 {% if groups.masters | length > 1 %}
 openshift_master_cluster_method=native
@@ -103,5 +110,7 @@ openshift_portal_net=172.200.0.0/16
 {{ hostvars[node].hostname }} glusterfs_devices='{{ hostvars[node].storage_devices | to_json}}'
 {% endfor %}
 
-# [glusterfs_registry]
-# master[1:3].example.com glusterfs_devices='["/dev/xvdc"]'
+[glusterfs_registry]
+{% for node in groups.storage %}
+{{ hostvars[node].hostname }} glusterfs_devices='{{ hostvars[node].storage_devices | to_json}}'
+{% endfor %}

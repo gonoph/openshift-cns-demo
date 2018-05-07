@@ -3,6 +3,8 @@
 
 - set_fact:
     storage_devices: "{{ storage_devices | default([]) }}"
+    sshconfig_clean: "{{ sshconfig_clean | default(False) | bool }}"
+    local_custom_certificates: "{{ local_custom_certificates | bool }}"
 
 - include_tasks: config_ssh.yml
   tags: [ localconfig, local_ssh ]
@@ -10,9 +12,21 @@
 - include_tasks: local_hosts.yml
   tags: [ localconfig, local_hosts ]
 
+- name: including easy_rsa tasks
+  include_tasks: easy_rsa.yml
+  run_once: true
+  when:
+    - local_custom_certificates
+    - not sshconfig_clean
+
+- include_tasks: copy_ca_certs.yml
+  when:
+    - local_custom_certificates
+    - not sshconfig_clean
+
 - include_tasks: make_ocp.yml
   tags: [ localconfig, local_ocp ]
 
 - include_tasks: root_login.yml
+  when: not sshconfig_clean
   tags: [ localconfig, local_root ]
-

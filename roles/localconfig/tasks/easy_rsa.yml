@@ -1,0 +1,69 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: set easy_rsa script path and pki directories
+  set_fact:
+    easy_rsa_cmd: "{{ easy_rsa_cmd | default(default_easy_rsa_cmd) }}"
+    easy_rsa_args: "{{ easy_rsa_args | default( default_easy_rsa_args | join(' ') ) }}"
+    easy_rsa_master_pki: "{{ easy_rsa_master_pki | default(default_easy_rsa_master_pki) }}"
+    easy_rsa_router_pki: "{{ easy_rsa_router_pki | default(default_easy_rsa_router_pki) }}"
+
+- name: create Cluster CA Request for OCP
+  environment: 
+    EASYRSA_PKI: "{{ easy_rsa_router_pki }}"
+  command: "{{ easy_rsa_cmd }} {{ easy_rsa_args }} {{ item }}"
+  with_items:
+    - init-pki
+    - --req-cn='Cluster CA' build-ca subca nopass
+
+- name: create Master CA, sign Cluster CA, create wildcard router cert
+  environment: 
+    EASYRSA_PKI: "{{ easy_rsa_master_pki }}"
+  command: "{{ easy_rsa_cmd }} {{ easy_rsa_args }} {{ item }}"
+  with_items:
+    - init-pki
+    - --req-cn='Master CA' build-ca nopass
+    - import-req {{ easy_rsa_router_pki }}/reqs/ca.req router-ca
+    - sign-req ca router-ca
+    - "--subject-alt-name='{{ alt_names | join(space) }}' build-server-full {{ ocp_app_domain }} nopass"
+  vars:
+    space: ' '
+    alt_names:
+      - "DNS:{{ ocp_app_domain }}"
+      - "DNS:*.{{ ocp_app_domain }}"
+      - "{{ hostvars | ip_to_altnames('ec2') | join(' ') }}"
+
+- name: make sure CA file directories are created
+  file:
+    path: "{{ item | dirname}}"
+    state: directory
+  when: item | length > 0
+  with_items: "{{ ca_cert_facts.ec2_cert_paths.master + ca_cert_facts.ec2_cert_paths.router }}"
+  loop_control:
+    label: "{{ item }}"
+
+- name: Position CA files and keys
+  copy:
+    dest: "{{ item.path }}"
+    content: "{{ lookup(item.type, item.args) }}"
+  when: item.path | length > 0
+  with_items:
+    - path: "{{ mca.certfile | default('') }}"
+      type: pipe
+      args: "for i in router-ca.crt ca.crt ; do find {{ easy_rsa_master_pki }} -type f -name $i 2>/dev/null ; done | xargs -n 1 openssl x509 -in"
+    - path: "{{ mca.keyfile | default('') }}"
+      type: file
+      args: "{{ easy_rsa_router_pki }}/private/ca.key"
+    - path: "{{ rca.certfile | default('') }}"
+      type: file
+      args: "{{ easy_rsa_router_pki }}/issued/{{ ocp_app_domain }}.crt"
+    - path: "{{ rca.keyfile | default('') }}"
+      type: file
+      args: "{{ easy_rsa_router_pki }}/private/{{ ocp_app_domain }}.key"
+    - path: "{{ rca.cafile | default('') }}"
+      type: file
+      args: "{{ easy_rsa_router_pki }}/ca.crt"
+  loop_control:
+    label: "{{ item.path }}"
+  vars:
+    mca: "{{ openshift_master_ca_certificate | default({}) }}"
+    rca: "{{ openshift_hosted_router_certificate | default({}) }}"

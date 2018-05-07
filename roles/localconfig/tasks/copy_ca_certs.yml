@@ -1,0 +1,20 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- debug:
+    var: ca_cert_facts.ec2_cert_has_router_cert
+
+- name: copy ca certs to pki anchors
+  connection: smart
+  become: true
+  copy:
+    dest: /etc/pki/ca-trust/source/anchors/
+    src: "{{ item }}"
+  when: "{{ item | length > 0 }}"
+  with_items:
+    - "{{ openshift_master_ca_certificate.certfile if ca_cert_facts.ec2_cert_has_master_ca else '' }}"
+    - "{{ openshift_hosted_router_certificate.cafile if ca_cert_facts.ec2_cert_has_router_cert else '' }}"
+
+- name: update-ca
+  become: true
+  command: update-ca-trust
+  changed_when: false
