@@ -1,42 +1,5 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
-- name: find connection profile
-  shell: |
-    UUID=$(nmcli --fields uuid,device c show | grep "{{ ansible_default_ipv4.alias }} *$" | cut -d ' ' -f 1);
-    echo "uuid: $UUID"
-  register: out_profile
-  changed_when: false
-
-- set_fact:
-    out_profile: "{{ out_profile.stdout | from_yaml }}"
-
-- name: ensure NetworkManager protects resolv.conf
-  shell: |
-    nmcli c show "{{ out_profile.uuid }}" | grep -i -e ipv4.ignore-auto-dns: -e ipv4.dns: | cut -d. -f 2-
-  changed_when: false
-  register: out_nmcli
-
-- set_fact:
-    out_nmcli:
-      dns: "{{ ( yml.dns | default('') ) is none | ternary('', yml.dns | default('') ) }}"
-      ignore-auto-dns: "{{ yml['ignore-auto-dns'] | default(False) }}"
-  vars:
-    yml: "{{ out_nmcli.stdout | from_yaml }}"
-
-- name: copy local resolv to dnsmasq resolv
-  when: |
-    internal_ip not in out_nmcli.dns | default([]) and not out_nmcli['ignore-auto-dns']
-  copy:
-    src: /etc/resolv.conf
-    dest: /etc/dnsmasq.resolv
-    remote_src: true
-  notify: restart network
-
-- name: point dns locally
-  command: "/usr/bin/nmcli c modify '{{ out_profile.uuid }}' -ipv4.dns '' ipv4.dns {{ internal_ip }} ipv4.ignore-auto-dns yes"
-  when: |
-    internal_ip not in out_nmcli.dns | default([]) and not out_nmcli['ignore-auto-dns']
-  notify: restart network
 
 - name: copy dnsmasq config file
   template:
@@ -44,6 +7,14 @@
     dest: /etc/dnsmasq.conf
   notify:
     - restart dnsmasq
+
+- name: copy local resolv to dnsmasq resolv
+  copy:
+    src: /etc/resolv.conf.bak
+    dest: /etc/dnsmasq.resolv
+    remote_src: true
+    backup: true
+  notify: restart network
 
 - name: ensure hosts file has fqdn
   blockinfile:
