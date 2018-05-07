@@ -1,6 +1,10 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
 
+- include_tasks: check_docker.yml
+  when: ansible_pkg_mgr == 'atomic_container'
+  tags: [ rhel, rhel_docker ]
+
 - include_tasks: hostname.yml
   tags: [ rhel, rhel_hostname ]
 
@@ -16,3 +20,11 @@
 
 - include_tasks: storage.yml
   tags: [ rhel, rhel_storage ]
+
+- include_tasks: test_dns.yml
+  tags: [ rhel, rhel_test ]
+
+- include_tasks: seed_docker.yml
+  when: inventory_hostname in groups.nodes
+  tags: [ rhek, rhel_seed ]
+
