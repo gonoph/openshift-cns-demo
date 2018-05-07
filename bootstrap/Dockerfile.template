@@ -30,6 +30,7 @@ RUN    	sed -i 's/^enabled=1/enabled=0/' /etc/yum.repos.d/fedora-updates-testing
 	# python2-pip \
 	python2-boto \
 	python2-boto3 \
+	python2-docker-py \
 	python2-netaddr \
 	python2-passlib \
 	python3.x86_64 \
