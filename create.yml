@@ -15,7 +15,7 @@
 - name: configure local environment to see hosts
   any_errors_fatal: true
   force_handlers: true
-  hosts: all
+  hosts: ec2
   gather_facts: false
   connection: local
   tags: [ always ]

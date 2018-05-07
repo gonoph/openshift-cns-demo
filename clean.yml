@@ -42,6 +42,6 @@
   gather_facts: false
   connection: local
   vars:
-    - sshconfig_clean: true
+    sshconfig_clean: true
   tags: [ always ]
   roles: [ localconfig ]
