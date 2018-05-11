@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# this is used for timing the project
+# sometimes AWS networking times out in weird ways, so this allows me to run it again
+make post || make post || make post

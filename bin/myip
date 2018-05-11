@@ -1,0 +1,18 @@
+#!/bin/sh
+
+mydir=$(dirname $0)
+API_KEY=$(find ./$mydir/../roles -type f | xargs grep ec2_api_getip_key: | cut -d' ' -f 2)
+API_HEADER=x-api-key
+API_URL=$(find ./$mydir/../roles -type f | xargs grep ec2_api_getip_url: | cut -d' ' -f 2)
+
+T=$(mktemp)
+
+trap "rm -rf $T" EXIT
+
+curl -s -H "$API_HEADER: $API_KEY" "$API_URL" > $T
+
+if fgrep -q sourceIP $T ;  then
+	jq '{ "This IP Address": .sourceIP }'  $T
+else
+	jq . $T
+fi
