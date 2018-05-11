@@ -7,7 +7,6 @@
   hosts: dns
   gather_facts: true
   connection: smart
-  tags: [ dns ]
   roles:
     - dns
   tasks: []
@@ -18,7 +17,6 @@
   hosts: all !dns
   gather_facts: true
   connection: smart
-  tags: [ rhel ]
   roles:
     - rhel
   tasks: []

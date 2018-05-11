@@ -6,7 +6,6 @@
   hosts: ec2
   gather_facts: false
   connection: local
-  tags: ec2
   vars:
     ec2_create: true
   roles:
@@ -18,5 +17,5 @@
   hosts: ec2
   gather_facts: false
   connection: local
-  tags: [ always ]
-  roles: [ localconfig ]
+  roles:
+    - localconfig

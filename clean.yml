@@ -24,7 +24,6 @@
   hosts: ec2
   gather_facts: false
   connection: local
-  tags: [ ec2 ]
   vars:
     ec2_destroy: true
 
@@ -33,7 +32,9 @@
 
   tasks:
   - meta: clear_host_errors
+    tags: [ always ]
   - meta: refresh_inventory
+    tags: [ always ]
 
 - name: Final Cleanup
   any_errors_fatal: true
