@@ -56,10 +56,9 @@ listen lb_router_ssl
 
 listen lb_router_http
     bind		*:80
-    mode                tcp
-    option              tcplog
-    option              tcp-check
-    # option              ssl-hello-chk
+    mode                http
+    option              httplog
+    option              httpchk
 
     balance source
 
