@@ -1,7 +1,7 @@
 .PHONY: $(PLAYBOOK_targets) all clean help test
 MAKEFILE_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-DEBUG:=time
+# DEBUG:=echo
 FLAG_CREATE:=.flag-create
 FLAG_CONFIG:=.flag-config
 FLAG_OCP:=.flag-ocp
