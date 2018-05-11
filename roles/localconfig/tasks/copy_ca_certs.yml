@@ -1,15 +1,11 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
-- debug:
-    var: ca_cert_facts.ec2_cert_has_router_cert
-
 - name: copy ca certs to pki anchors
   connection: smart
   become: true
   copy:
-    dest: /etc/pki/ca-trust/source/anchors/
-    src: "{{ item }}"
-  when: "{{ item | length > 0 }}"
+    dest: "/etc/pki/ca-trust/source/anchors/{{ item.dst }}"
+    src: "{{ item.src }}"
   with_items:
     - { src: "{{ easy_rsa_ocp_pki }}/ca.crt", dst: "ocp-ca.crt" }
     - { src: "{{ easy_rsa_master_pki }}/ca.crt", dst: "company-ca-crt" }
