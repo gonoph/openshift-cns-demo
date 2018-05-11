@@ -2,13 +2,13 @@
 ---
 - name: check AWS variables
   include_tasks: aws_check.yml
-  tags: [ec2]
+  tags: [ec2, ec2_network, ec2_create]
 
 - name: lookup VPC or subnets, and define Security Group
   include_tasks: vpc_subnet_sg.yml
   when: ec2_create
-  tags: [ec2]
+  tags: [ec2, ec2_network]
 
 - name: create or clean instances
   include_tasks: ec2_instances.yml
-  tags: [ec2]
+  tags: [ec2, ec2_create]
