@@ -1,2 +1,3 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
+rhel_openshift_image_tag: "{{ openshift_image_tag | default('v' + openshift_release) }}"

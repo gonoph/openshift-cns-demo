@@ -11,9 +11,10 @@ ocp_hostname="ocp.{{ ocp_domain }}"
 hostname="{{ inventory_hostname }}.{{public_ip}}.nip.io"
 
 openshift_release=3.7
-openshift_image_tag=v3.7.44
+openshift_image_tag=v3.7.2
+# openshift_image_tag=v3.7.44
 # origin or openshift-enterprise
-openshift_deployment_type=openshift-enterprise
+openshift_deployment_type=origin
 
 # Demo Customer CA Certificate
 # This creates a demo of a company CA that signs and creates an OCP CA

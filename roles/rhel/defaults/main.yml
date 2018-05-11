@@ -19,16 +19,40 @@ rhel_install_packages:
 rhel_seed_images_nodes: "{{ rhel_seed_images_enterprise_nodes if openshift_deployment_type == 'openshift-enterprise' else rhel_seed_images_origin_nodes }}"
 rhel_seed_images_masters: "{{ rhel_seed_images_enterprise_masters if openshift_deployment_type == 'openshift-enterprise' else rhel_seed_images_origin_masters }}"
 rhel_seed_images_infra: "{{ rhel_seed_images_enterprise_infra if openshift_deployment_type == 'openshift-enterprise' else rhel_seed_images_origin_infra }}"
-rhel_seed_images_origin_nodes: []
-rhel_seed_images_origin_masters: []
-rhel_seed_images_origin_infra: []
+
+rhel_seed_images_origin_nodes:
+  - "docker.io/openshift/node:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/openvswitch:{{ rhel_openshift_image_tag }}"
+
+rhel_seed_images_origin_masters:
+  - "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v{{ openshift_release }}"
+  - "docker.io/gluster/gluster-centos:latest"
+  - "docker.io/openshift/origin-pod:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin-pod:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin-service-catalog:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin-service-catalog:v{{ openshift_release }}"
+  - "registry.fedoraproject.org/f26/etcd:latest"
+
+rhel_seed_images_origin_infra:
+  - "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v{{ openshift_release }}"
+  - "docker.io/cockpit/kubernetes:latest"
+  - "docker.io/heketi/heketi:latest"
+  - "docker.io/openshift/origin-deployer:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin-docker-registry:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin-haproxy-router:{{ rhel_openshift_image_tag }}"
+  - "docker.io/openshift/origin:latest"
+  - "docker.io/openshift/origin-metrics-cassandra:v{{ openshift_release }}"
+  - "docker.io/openshift/origin-metrics-hawkular-metrics:v{{ openshift_release }}"
+  - "docker.io/openshift/origin-metrics-heapster:v{{ openshift_release }}"
+  - "docker.io/openshift/origin-pod:{{ rhel_openshift_image_tag }}"
 
 rhel_seed_images_enterprise_nodes:
-  - "registry.access.redhat.com/openshift3/node:{{ openshift_image_tag }}"
-  - "registry.access.redhat.com/openshift3/openvswitch:{{ openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/node:{{ rhel_openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/openvswitch:{{ rhel_openshift_image_tag }}"
 
 rhel_seed_images_enterprise_masters:
-  - "registry.access.redhat.com/openshift3/ose:{{ openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/ose:{{ rhel_openshift_image_tag }}"
   - "registry.access.redhat.com/rhel7/etcd:latest"
 
 rhel_seed_images_enterprise_infra:
@@ -40,10 +64,10 @@ rhel_seed_images_enterprise_infra:
   - "registry.access.redhat.com/openshift3/metrics-cassandra:v{{ openshift_release }}"
   - "registry.access.redhat.com/openshift3/metrics-hawkular-metrics:v{{ openshift_release }}"
   - "registry.access.redhat.com/openshift3/metrics-heapster:v{{ openshift_release }}"
-  - "registry.access.redhat.com/openshift3/ose-deployer:{{ openshift_image_tag }}"
-  - "registry.access.redhat.com/openshift3/ose-docker-registry:{{ openshift_image_tag }}"
-  - "registry.access.redhat.com/openshift3/ose-haproxy-router:{{ openshift_image_tag }}"
-  - "registry.access.redhat.com/openshift3/ose-pod:{{ openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/ose-deployer:{{ rhel_openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/ose-docker-registry:{{ rhel_openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/ose-haproxy-router:{{ rhel_openshift_image_tag }}"
+  - "registry.access.redhat.com/openshift3/ose-pod:{{ rhel_openshift_image_tag }}"
   - "registry.access.redhat.com/openshift3/ose-service-catalog:v{{ openshift_release }}"
   - "registry.access.redhat.com/openshift3/registry-console:v{{ openshift_release }}"
   - "registry.access.redhat.com/rhgs3/rhgs-gluster-block-prov-rhel7:latest"
