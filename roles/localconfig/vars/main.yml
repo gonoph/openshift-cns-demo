@@ -13,4 +13,3 @@ easy_rsa_args: >-
   --req-org=Openshift
   --req-ou=Demo
   --req-email=''
-easy_rsa_master_ca_certificate

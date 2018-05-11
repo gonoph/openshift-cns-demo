@@ -5,6 +5,7 @@
     storage_devices: "{{ storage_devices | default([]) }}"
     sshconfig_clean: "{{ sshconfig_clean | default(False) | bool }}"
     local_custom_certificates: "{{ local_custom_certificates | bool }}"
+  tags: [ always ]
 
 - include_tasks: config_ssh.yml
   tags: [ localconfig, local_ssh ]
@@ -14,12 +15,14 @@
 
 - name: including easy_rsa tasks
   include_tasks: easy_rsa.yml
+  tags: [ localconfig, local_ca ]
   run_once: true
   when:
     - local_custom_certificates
     - not sshconfig_clean
 
 - include_tasks: copy_ca_certs.yml
+  tags: [ localconfig, local_copy_ca ]
   when:
     - local_custom_certificates
     - not sshconfig_clean

@@ -11,10 +11,9 @@
     src: "{{ item }}"
   when: "{{ item | length > 0 }}"
   with_items:
-    - "{{ openshift_master_ca_certificate.certfile if ca_cert_facts.ec2_cert_has_master_ca else '' }}"
-    - "{{ openshift_hosted_router_certificate.cafile if ca_cert_facts.ec2_cert_has_router_cert else '' }}"
+    - { src: "{{ easy_rsa_ocp_pki }}/ca.crt", dst: "ocp-ca.crt" }
+    - { src: "{{ easy_rsa_master_pki }}/ca.crt", dst: "company-ca-crt" }
+  notify: updated ca
 
-- name: update-ca
-  become: true
-  command: update-ca-trust
-  changed_when: false
+- name: update ca certs if needed
+  meta: flush_handlers

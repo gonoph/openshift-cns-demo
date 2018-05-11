@@ -29,15 +29,13 @@ openshift_hostname={{ inventory_hostname  }}
 openshift_master_ingress_ip_network_cidr=172.250.0.0/16
 
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+# create these with: openssl passwd -apr1 <PASSWORD>
 # admin: adminuser123
 # demo: demouser123
 openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
 
-{% if openshift_master_ca_certificate is defined %}
-openshift_master_ca_certificate={{ openshift_master_ca_certificate | to_json | replace('"', "'") }}
-{% endif %}
-{% if openshift_hosted_router_certificate is defined %}
-openshift_hosted_router_certificate={{ openshift_hosted_router_certificate | to_json | replace('"', "'") }}
+{% if local_custom_certificates %}
+openshift_master_ca_certificate={'certfile': '{{ easy_rsa_ocp_pki }}/ca-bundle.crt', 'keyfile': '{{ easy_rsa_ocp_pki }}/private/ca.key'}
 {% endif %}
 
 {% if groups.masters | length > 1 %}
