@@ -63,9 +63,9 @@ listen lb_router_http
     balance source
 
     use-server certserv if { path_beg -i /ca/ }
-    server certserv     {{ dns_ip }}:8080 check weight 0
+    server certserv     {{ dns_ip }}:8080 weight 0
 {% for hn in groups_infra %}
 {% if 'internal_ip' in hostvars[hn] %}
-    server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:80 check
+    server {{ hn.split('.') | first }}	{{ hostvars[hn].internal_ip }}:80
 {% endif %}
 {% endfor %}
