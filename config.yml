@@ -1,14 +1,5 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
-- name: get EC2 instances
-  any_errors_fatal: true
-  force_handlers: true
-  hosts: ec2
-  gather_facts: false
-  connection: local
-  tags: [ ec2 ]
-  roles:
-    - ec2
 
 - name: Configure dns instances
   any_errors_fatal: true
@@ -16,7 +7,6 @@
   hosts: dns
   gather_facts: true
   connection: smart
-  tags: [ dns ]
   roles:
     - dns
   tasks: []
@@ -27,7 +17,6 @@
   hosts: all !dns
   gather_facts: true
   connection: smart
-  tags: [ rhel ]
   roles:
     - rhel
   tasks: []

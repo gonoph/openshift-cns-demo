@@ -4,6 +4,8 @@ MAKEFILE_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 DOCKERFILE?=Dockerfile
 DOCKER_LABEL?=localhost/ocp-installer:latest
 
+MOTD=files/etc/motd
+
 all: build
 
 TEST_NEEDS_SUDO:=$(shell docker ps > /dev/null 2>&1 && echo no || echo yes)
@@ -19,12 +21,15 @@ build: $(DOCKERFILE)
 
 GID=$(shell id -g)
 UID=$(shell id -u)
-$(DOCKERFILE): $(DOCKERFILE).template Makefile
-	sed -n '/^# Usage/,/# Explaination of playbooks/p' ../README.md  | head -n -1 > motd
+
+$(MOTD): Makefile
+	sed -n '/^# Usage/,/# Explaination of playbooks/p' ../README.md  | head -n -1 > files/etc/motd
+
+$(DOCKERFILE): $(DOCKERFILE).template $(MOTD) Makefile
 	sed -e "s,%%GID%%,$(GID)," -e "s,%%UID%%,$(UID)," $(DOCKERFILE).template > $(DOCKERFILE)
 
 clean: $(DOCKERFILE).template
-	rm -fv $(DOCKERFILE) motd
+	rm -fv $(DOCKERFILE) files/etc/motd
 
 .ONESHELL:
 run: $(DOCKERFILE)

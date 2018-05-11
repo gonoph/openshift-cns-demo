@@ -5,6 +5,7 @@
     state: present
     org_id: "{{ subscription_org }}"
     activationkey: "{{ subscription_ak }}"
+  when: subscription_org is defined and subscription_ak is defined
   notify:
     - disable all repos
     - enable repos

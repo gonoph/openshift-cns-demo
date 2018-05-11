@@ -1,56 +1,35 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
 
-- name: ensure ~/.ssh dir exists
-  run_once: true
-  file:
-    path: "{{ sshconfig_path | dirname }}"
-    mode: 0700
-    state: directory
+- set_fact:
+    storage_devices: "{{ storage_devices | default([]) }}"
+    sshconfig_clean: "{{ sshconfig_clean | default(False) | bool }}"
+    local_custom_certificates: "{{ local_custom_certificates | bool }}"
+  tags: [ always ]
 
-- name: ensure ~/.ssh/config file exists
-  run_once: true
-  copy:
-    dest: "{{ sshconfig_path }}"
-    content: ''
-    mode: 0640
-    force: false
+- include_tasks: config_ssh.yml
+  tags: [ localconfig, local_ssh ]
 
-- name: removing from ssh config
-  when: sshconfig_clean is defined
-  run_once: true
-  blockinfile:
-    marker: "# {mark} OCP-DEMO MANAGED BLOCK"
-    path: "{{ sshconfig_path }}"
-    state: absent
+- include_tasks: local_hosts.yml
+  tags: [ localconfig, local_hosts ]
 
-- name: adding to ssh config
-  when: sshconfig_clean is not defined
+- name: including easy_rsa tasks
+  include_tasks: easy_rsa.yml
+  tags: [ localconfig, local_ca ]
   run_once: true
-  blockinfile:
-    marker: "# {mark} OCP-DEMO MANAGED BLOCK"
-    path: "{{ sshconfig_path }}"
-    block: |
-      {% for hn in play_hosts %}
-      {% if hostvars[hn].public_ip | default('') | length > 0 %}
-      Host {{ hn }} {{ hn.split('.') | first }} {{ hostvars[hn].public_ip }} {{ hostvars[hn].internal_ip }}
-        Hostname {{ hostvars[hn].public_ip }}
-        UserKnownHostsFile /dev/null
-        StrictHostKeyChecking no
-        User {{ ansible_user }}
-      {% endif %}
-      {% endfor %}
+  when:
+    - local_custom_certificates
+    - not sshconfig_clean
 
-- name: add hosts to /etc/hosts file
-  become: true
-  run_once: true
-  blockinfile:
-    unsafe_writes: true
-    path: /etc/hosts
-    block: |
-      {% for hn in groups.OSEv3 %}
-      {%   if hostvars[hn].public_ip | default('') | length > 0 %}
-      {%     set routes = '' if hn not in groups.masters else storage_routes %}
-      {{ hostvars[hn].public_ip }}     {{ hn }} {{ routes }}
-      {%   endif %}
-      {% endfor %}
+- include_tasks: copy_ca_certs.yml
+  tags: [ localconfig, local_copy_ca ]
+  when:
+    - local_custom_certificates
+    - not sshconfig_clean
+
+- include_tasks: make_ocp.yml
+  tags: [ localconfig, local_ocp ]
+
+- include_tasks: root_login.yml
+  when: not sshconfig_clean
+  tags: [ localconfig, local_root ]

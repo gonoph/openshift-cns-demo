@@ -1,0 +1,37 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: create Cluster CA Request for OCP
+  environment: 
+    EASYRSA_PKI: "{{ easy_rsa_ocp_pki }}"
+  command: "{{ easy_rsa_cmd }} {{ easy_rsa_args }} {{ item.cmd }}"
+  args:
+    creates: "{{ easy_rsa_ocp_pki }}/{{ item.file }}"
+  with_items:
+    - { cmd: init-pki, file: reqs }
+    - { cmd: --req-cn='Cluster CA' build-ca subca nopass, file: reqs/ca.req }
+
+- name: create Master CA, sign OCP CA
+  environment: 
+    EASYRSA_PKI: "{{ easy_rsa_master_pki }}"
+  command: "{{ easy_rsa_cmd }} {{ easy_rsa_args }} {{ item.cmd }}"
+  args:
+    creates: "{{ easy_rsa_master_pki }}/{{ item.file }}"
+  with_items:
+    - { cmd: init-pki, file: reqs }
+    - { cmd: --req-cn='Master CA' build-ca nopass, file: ca.crt }
+    - { cmd: "import-req {{ easy_rsa_ocp_pki }}/reqs/ca.req ocp-ca", file: reqs/ocp-ca.req }
+    - { cmd: sign-req ca ocp-ca, file: issued/ocp-ca.crt }
+
+- name: create ca-bundle.crt
+  shell: |
+    T=$(mktemp)
+    trap "rm -f $T" EXIT
+    set -e -E
+    openssl x509 -in {{ easy_rsa_master_pki }}/issued/ocp-ca.crt -text > $T
+    test -s $T && cp $T {{ easy_rsa_ocp_pki }}/ca.crt
+    openssl x509 -in {{ easy_rsa_master_pki }}/issued/ocp-ca.crt > $T
+    openssl x509 -in {{ easy_rsa_master_pki }}/ca.crt >> $T
+    test -s $T && cp $T {{ easy_rsa_ocp_pki }}/ca-bundle.crt
+  args:
+    creates: "{{ easy_rsa_ocp_pki }}/ca-bundle.crt"

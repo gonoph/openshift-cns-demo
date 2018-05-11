@@ -2,6 +2,7 @@
 ---
 
 - name: ensure root can login
+  connection: smart
   become: true
   copy:
     src: "~{{ ansible_user }}/.ssh/authorized_keys"

@@ -1,0 +1,20 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- include_tasks: seed_docker_task.yml
+  when: inventory_hostname in groups.nodes
+  vars:
+    type: nodes
+    images: "{{ rhel_seed_images_nodes }}"
+
+- include_tasks: seed_docker_task.yml
+  when: inventory_hostname in groups.masters
+  vars:
+    type: masters
+    images: "{{ rhel_seed_images_masters }}"
+
+- include_tasks: seed_docker_task.yml
+  when: inventory_hostname in (groups.nodes + groups.masters)
+  vars:
+    type: infra
+    images: "{{ rhel_seed_images_infra }}"

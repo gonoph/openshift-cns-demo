@@ -4,6 +4,7 @@
   hosts: ec2
   gather_facts: false
   connection: local
+  tags: [ always ]
   roles: 
   - ec2
 
@@ -17,6 +18,7 @@
     redhat_subscription:
       state: 'absent'
     when: ansible_host | default(False)
+    tags: [ rhel ]
 
 - name: Remove EC2 instances
   hosts: ec2
@@ -30,7 +32,9 @@
 
   tasks:
   - meta: clear_host_errors
+    tags: [ always ]
   - meta: refresh_inventory
+    tags: [ always ]
 
 - name: Final Cleanup
   any_errors_fatal: true
@@ -39,6 +43,6 @@
   gather_facts: false
   connection: local
   vars:
-    - sshconfig_clean: true
+    sshconfig_clean: true
   tags: [ always ]
   roles: [ localconfig ]

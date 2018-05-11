@@ -42,6 +42,7 @@
     var: ec2_facts
   vars:
     ec2_facts:
+      hostname: "{{ hostname }}"
       internal_ip: "{{ internal_ip }}"
       ansible_host: "{{ ansible_host }}"
       ec2_instance_ids: "{{ ec2_instance_ids }}"
@@ -55,4 +56,3 @@
     region: "{{ ec2_region }}"
     instance_ids: "{{ ec2_instance_ids }}"
     state: absent
-

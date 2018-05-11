@@ -10,7 +10,9 @@
 You should just need to run this:
 
 ```bash
-yum install -y docker screen git make
+sudo yum install -y docker screen git make
+sudo systemctl enable docker
+sudo systemctl start docker
 ```
 
 Then run:

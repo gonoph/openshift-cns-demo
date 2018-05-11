@@ -3,9 +3,11 @@
 bootstrap/Dockerfile
 *.retry
 bootstrap/aws
-bootstrap/motd
+bootstrap/files/etc/motd
 .*.swp
 .flag-*
+inventory/demo.ocp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

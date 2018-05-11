@@ -6,13 +6,6 @@ detail() {
 	echo "##########"
 }
 
-if [ "x$1" != "xtest" ] ; then
-	set -e -E
-	detail "Running deploy script for storage"
-	./gluster-kubernetes/deploy/gk-deploy -g /tmp/topology.json  -n storage -y
-	exit 0
-fi
-
 detail "Creating test PVC - claim1"
 
 /usr/bin/oc create -f - << YAML
@@ -25,7 +18,7 @@ spec:
     - "ReadWriteOnce"
   resources:
     requests:
-      storage: "5Gi"
+      storage: "1Gi"
 YAML
 
 CURRENT=$(date +%s)

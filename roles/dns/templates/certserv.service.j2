@@ -1,0 +1,16 @@
+[Unit]
+Description=certificate http service 
+After=docker.service
+Requires=docker.service
+PartOf=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker rm -f {{ certserv_container_name }}
+ExecStart=/usr/bin/docker run --name={{ certserv_container_name }} --rm --user=100 --group-add=100 -p 8080:8080 --workdir=/tmp {{ certserv_image }}
+ExecStop=/usr/bin/docker stop {{ certserv_container_name }}
+SyslogIdentifier={{ certserv_container_name }}
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=docker.service

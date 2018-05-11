@@ -1,0 +1,17 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- block:
+
+  - name: check docker version of atomic
+    command: /usr/bin/docker --version
+    changed_when: false
+    register: docker_out
+
+  - assert:
+      that: "{{ ( (docker_out.stdout.split(',') | first).split(' ') )[2] | to_version < 1013000 }}"
+      msg: "For OCP 3.7, docker version must be less than 1.13.0"
+
+  when:
+    - openshift_release | to_version == 3007
+    - openshift_deployment_type == 'openshift-enterprise'

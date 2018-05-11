@@ -1,8 +1,8 @@
 [submodule "openshift-ansible"]
 	path = openshift-ansible
 	url = https://github.com/openshift/openshift-ansible.git
-	branch = release-3.6
-[submodule "gluster-kubernetes"]
-	path = gluster-kubernetes
-	url = https://github.com/gluster/gluster-kubernetes.git
-	branch = v1.2.0
+	branch = openshift-ansible-3.7.44-1
+[submodule "easy-rsa"]
+	path = easy-rsa
+	url = https://github.com/OpenVPN/easy-rsa
+	branch = v3.0.5

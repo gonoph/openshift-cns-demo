@@ -18,10 +18,60 @@
 
 - name: copy haproxy services file
   template:
-    src: templates/haproxy.service.j2
+    src: haproxy.service.j2
     dest: /etc/systemd/system/haproxy.service
   notify:
     - restart haproxy
+
+- name: check if custom ca exists
+  connection: local
+  stat:
+    path: "{{ item }}"
+  register: rhel_ca_stat
+  when: item | length > 0
+  with_items:
+    - "{{ (openshift_master_ca_certificate | default({})).certfile | default('') }}"
+
+- name: set rhel_ca_file
+  set_fact:
+    rhel_ca_file: "{{ rhel_ca_stat.results | selectattr('stat', 'defined') | selectattr('stat.exists') | map(attribute='item') | list | first | default('') }}"
+
+- name: create docker build dir
+  file:
+    path: "{{ certserv_build_dir }}"
+    state: directory
+  when: rhel_ca_file | length > 0
+
+- name: copy docker build files
+  copy:
+    src: "{{ item.s }}"
+    dest: "{{ certserv_build_dir }}/{{ item.d }}"
+    mode: 0444
+    owner: 100
+    group: 100
+  when: rhel_ca_file | length > 0
+  register: certserv_copy_build
+  with_items:
+    - { s: Dockerfile, d: Dockerfile }
+    - { s: certserv.py, d: certserv.py }
+    - { s: "{{ rhel_ca_file }}", d: ca.crt }
+
+- name: Build certserv image
+  when: rhel_ca_file | length > 0
+  docker_image:
+    name: "{{ certserv_image }}"
+    path: "{{ certserv_build_dir }}"
+    force: "{{ certserv_copy_build is changed }}"
+  notify:
+    - restart certserv
+
+- name: copy certserv services file
+  when: rhel_ca_file | length > 0
+  template:
+    src: certserv.service.j2
+    dest: /etc/systemd/system/certserv.service
+  notify:
+    - restart certserv
 
 - meta: flush_handlers
 
@@ -31,3 +81,11 @@
     state: started
     daemon_reload: true
     enabled: true
+
+- name: ensure certserv has started
+  ignore_errors: true
+  systemd:
+    name: certserv
+    state: started
+    daemon_reload: true
+    enabled: "{{ rhel_ca_file | length > 0 }}"

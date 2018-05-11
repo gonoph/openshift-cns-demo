@@ -6,27 +6,25 @@ FLAG_CREATE:=.flag-create
 FLAG_CONFIG:=.flag-config
 FLAG_OCP:=.flag-ocp
 FLAG_POST:=.flag-post
-FLAG_CNS_PRE:=.flag-cns-pre
-FLAG_CNS:=.flag-cns
-FLAG_CNS_POST:=.flag-cns-post
 
 PLAYBOOK_CLEAN:=clean.yml
 PLAYBOOK_CREATE:=create.yml
 PLAYBOOK_CONFIG:=config.yml
 PLAYBOOK_OCP:=ocp.yml
 PLAYBOOK_POST:=post_config.yml
-PLAYBOOK_CNS_PRE:=cns_prepare.yml
-PLAYBOOK_CNS_POST:=cns_post.yml
 
-PLAYBOOKS:=$(PLAYBOOK_CLEAN) $(PLAYBOOK_CREATE) $(PLAYBOOK_CONFIG) $(PLAYBOOK_OCP) $(PLAYBOOK_POST) $(PLAYBOOK_CNS_PRE) $(PLAYBOOK_CNS_POST)
-PLAYBOOK_flags:=$(FLAG_CREATE) $(FLAG_CONFIG) $(FLAG_OCP) $(FLAG_POST) $(FLAG_CNS_PRE) $(FLAG_CNS_POST)
+EC2_INVENTORY:=inventory/demo
+OCP_INVENTORY:=inventory/demo.ocp
 
-SCRIPT_CNS:=script_cns.sh
+PLAYBOOKS:=$(PLAYBOOK_CLEAN) $(PLAYBOOK_CREATE) $(PLAYBOOK_CONFIG) $(PLAYBOOK_OCP) $(PLAYBOOK_POST)
+PLAYBOOK_flags:=$(FLAG_CREATE) $(FLAG_CONFIG) $(FLAG_OCP) $(FLAG_POST)
+
+SCRIPT_TEST:=storage_test.sh
 
 CREATE_DEPS:=~/.ssh
 
 help:
-	@echo "Usage: make (help|all|clean|create|config|ocp|post|cns-pre|cns|cns-post|test)"
+	@echo "Usage: make (help|all|clean|create|config|ocp|post|test)"
 	@echo "   help:     this help"
 	@echo "   all:      run everything in the proper order"
 	@echo "   clean:    clean up environment - delete EC2 instances"
@@ -34,35 +32,31 @@ help:
 	@echo "   config:   configure the EC2 instances"
 	@echo "   ocp:      run the OCP playbook on the EC2 instances"
 	@echo "   post:     post configure OCP with some sane values"
-	@echo "   cns-pre:  pre-configure the storage hosts for CNS"
-	@echo "   cns:      install CNS on the hosts"
-	@echo "   cns-post: post-configure the storage hosts for CNS"
-	@echo "   test:     test that CNS is working"
+	@echo "   test:     test that Storage is working"
+	@echo "   myip:     helper target to add your current IP to the AWS VPC"
 
-all: create config ocp post cns-pre cns cns-post test
+all: create config ocp post test
+
+clean create myip: INVENTORY_FILE=$(EC2_INVENTORY)
+config ocp post test: INVENTORY_FILE=$(OCP_INVENTORY)
+
 clean: $(PLAYBOOK_CLEAN)
-	$(DEBUG) ./demo.sh $<
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) $<
 	rm -f .flag-* *.retry
-create: $(FLAG_CREATE)
-config: create $(FLAG_CONFIG)
-ocp: config $(FLAG_OCP)
-post: ocp  $(FLAG_POST)
-cns-pre: post $(FLAG_CNS_PRE)
-cns: cns-pre $(FLAG_CNS)
-cns-post: cns $(FLAG_CNS_POST)
-test: cns-post
-	$(DEBUG) ./$(SCRIPT_CNS) test
+create: $(EC2_INVENTORY) $(FLAG_CREATE)
+config: create $(OCP_INVENTORY) $(FLAG_CONFIG)
+ocp: config $(OCP_INVENTORY) $(FLAG_OCP)
+post: ocp  $(OCP_INVENTORY) $(FLAG_POST)
+test: post
+	$(DEBUG) ./$(SCRIPT_TEST) test
+myip:
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) create.yml --tags=ec2_network,untagged
 
-$(FLAG_CREATE): $(PLAYBOOK_CREATE) Makefile $(CREATE_DEPS)
-$(FLAG_CONFIG): $(PLAYBOOK_CONFIG) Makefile
-$(FLAG_OCP): $(PLAYBOOK_OCP) Makefile
-$(FLAG_POST): $(PLAYBOOK_POST) Makefile
-$(FLAG_CNS_PRE): $(PLAYBOOK_CNS_PRE) Makefile
-$(FLAG_CNS_POST): $(PLAYBOOK_CNS_POST) Makefile
-$(FLAG_CNS): $(SCRIPT_CNS) Makefile
-	$(DEBUG) ./$<
-	touch $@
+$(FLAG_CREATE): $(PLAYBOOK_CREATE) $(EC2_INVENTORY) Makefile $(CREATE_DEPS)
+$(FLAG_CONFIG): $(PLAYBOOK_CONFIG) $(OCP_INVENTORY) Makefile
+$(FLAG_OCP): $(PLAYBOOK_OCP) $(OCP_INVENTORY) Makefile
+$(FLAG_POST): $(PLAYBOOK_POST) $(OCP_INVENTORY) Makefile
 
 $(PLAYBOOK_flags):
-	$(DEBUG) ./demo.sh $<
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) $<
 	touch $@
