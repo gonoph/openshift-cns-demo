@@ -11,7 +11,7 @@ ocp_hostname="ocp.{{ ocp_domain }}"
 hostname="{{ inventory_hostname }}.{{public_ip}}.nip.io"
 
 openshift_release=3.7
-openshift_image_tag=v3.7.42-2
+openshift_image_tag=v3.7.44-6
 # origin or openshift-enterprise
 openshift_deployment_type=openshift-enterprise
 
