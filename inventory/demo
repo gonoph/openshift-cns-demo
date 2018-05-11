@@ -29,8 +29,8 @@ ec2_instance_type=t2.medium
 # ec2_ami_image=ami-68ee1915
 # the following is RHEL Atomic 7.4.4 in us-east-1 via Cloud Access (recommended)
 ec2_ami_image=ami-d97120a3
-# the following is my network
-ec2_mynetworks=[ '108.247.233.239/32', '50.204.119.2/32' ]
+# put your network here, but it will look up your current IP
+# ec2_mynetworks=[ ]
 # subnet will be picked from 1st subnet found in VPC if not defined
 # ec2_vpc_subnet=subnet-ffffffff
 # if you only have one VPC, then it will be selected, otherwise, define it here

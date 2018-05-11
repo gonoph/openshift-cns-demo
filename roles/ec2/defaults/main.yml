@@ -10,7 +10,9 @@ ec2_tags:
   Name: '{{ inventory_hostname }}'
   demo: ocp
 
-# ec2_mynetworks: [DEFINEME]
+# you can override this and put your current ip or network, but the playbook
+# will automatically put your external IP here
+ec2_mynetworks: [ ] 
 ec2_instance_type: t2.small
 ec2_keypair: ansible-dev
 ec2_security_group_name: openshift
