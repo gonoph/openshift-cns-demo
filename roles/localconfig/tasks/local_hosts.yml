@@ -13,6 +13,6 @@
       {%   if hostvars[hn].public_ip | default('') | length > 0 %}
       {%     set app = '' if hn not in groups.dns else ocp_app_domain %}
       {%     set ocp = '' if hn not in groups.dns else ocp_hostname %}
-      {{ hostvars[hn].public_ip }}     {{ hn }} {{ ocp }} {{ app }}
+      {{ hostvars[hn].public_ip }}     {{ hn }} {{ hostvars[hn].hostname }} {{ ocp }} {{ app }}
       {%   endif %}
       {% endfor %}

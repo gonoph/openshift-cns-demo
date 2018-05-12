@@ -6,3 +6,9 @@
 	path = easy-rsa
 	url = https://github.com/OpenVPN/easy-rsa
 	branch = v3.0.5
+[submodule "demos/pipcache"]
+	path = demos/pipcache
+	url = https://github.com/gonoph/pipcache.git
+[submodule "demos/demo-storage-microsvc"]
+	path = demos/demo-storage-microsvc
+	url = https://github.com/gonoph/demo-storage-microsvc.git

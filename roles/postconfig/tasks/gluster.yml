@@ -1,0 +1,23 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: set glusterfs namespace and prefix
+  set_fact:
+    gns: "{{ openshift_storage_glusterfs_namespace | default(default_openshift_storage_glusterfs_namespace) }}"
+    gname: "{{ openshift_storage_glusterfs_name | default(default_openshift_storage_glusterfs_name) }}"
+    ans: "{{ ansible_service_broker_namespace }}"
+    ans_check: 'Error from server (NotFound): namespaces "{{ ansible_service_broker_namespace }}" not found'
+
+- name: Storage - check if there is a default StorageClass
+  run_once: true
+  connection: local
+  register: storage_class_out
+  command: "/usr/bin/oc get storageclass -n {{ gns }}"
+  changed_when: "'(default)' not in storage_class_out.stdout"
+
+- name: Storage - patch StorageClass to make GlusterFS the default
+  run_once: true
+  connection: local
+  when: storage_class_out is changed
+  command: "/usr/bin/oc patch -n {{ gns}} storageclass glusterfs-{{ gname }} -p '{{ storage_class_patch }}'"
+  register: storage_patch_out
+  failed_when: "storage_patch_when_str not in storage_patch_out.stdout"

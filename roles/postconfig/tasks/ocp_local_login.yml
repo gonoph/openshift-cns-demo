@@ -1,0 +1,36 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: add admin user as cluster admin
+  become: true
+  run_once: true
+  command: /usr/local/bin/oc adm policy add-cluster-role-to-user cluster-admin admin
+
+- name: copy ca.crt to localhost
+  become: true
+  run_once: true
+  fetch:
+    src: /etc/origin/master/ca.crt
+    dest: /tmp/ocp-ca.crt
+    flat: yes
+
+- name: move ocp-ca.crt into ca-trusts
+  become: true
+  run_once: true
+  connection: local
+  register: move_ca
+  copy:
+    src: /tmp/ocp-ca.crt
+    dest: /etc/pki/ca-trust/source/anchors/ocp-ca.crt
+
+- name: update ca trusts
+  when: move_ca.changed
+  connection: local
+  become: true
+  run_once: true
+  command: update-ca-trust
+
+- name: login locally to ocp master as admin
+  connection: local
+  run_once: true
+  command: "/usr/bin/oc login {{ post_ocp_url }} -u admin -p {{ passwords.admin }}"

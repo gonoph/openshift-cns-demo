@@ -5,3 +5,5 @@ haproxy_container_name: haproxy
 certserv_build_dir: /tmp/dns_build
 certserv_image: certserv:latest
 certserv_container_name: certserv
+dns_ignore_domains:
+  - example.com

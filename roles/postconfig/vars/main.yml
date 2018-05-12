@@ -1,0 +1,23 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+storage_patch_when_str: 'storageclass "glusterfs-{{ gname }}" patched'
+gns: "{{ openshift_storage_glusterfs_namespace | default(default_openshift_storage_glusterfs_namespace) }}"
+gname: "{{ openshift_storage_glusterfs_name | default(default_openshift_storage_glusterfs_name) }}"
+ans: "{{ ansible_service_broker_namespace }}"
+tsb_namespace: "{{ template_service_broker_namespace }}"
+ans_check: 'Error from server (NotFound): namespaces "{{ ansible_service_broker_namespace }}" not found'
+post_ocp_hn: "{{ openshift_master_cluster_public_hostname | default(openshift_master_cluster_hostname | default(groups.masters | first) ) }}"
+post_certserv_url: "http://{{ hostvars[groups.dns | first].public_ip }}/ca/"
+post_ocp_url: "https://{{ post_ocp_hn }}:8443"
+
+demos:
+  pipcache:
+    path: "./demos/pipcache"
+    templates:
+      - pipcache-template-ephemeral.yaml
+      - pipcache-template-persistent.yaml
+  storage:
+    path: "./demos/demo-storage-microsvc"
+    templates:
+      - demo-storage-microsvc-template.yaml
+

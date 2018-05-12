@@ -1,0 +1,64 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: Ansible Service Broker - check that etcd PVC has a storageclass or is bound
+  run_once: true
+  connection: local
+  command: "/usr/bin/oc get pvc -n {{ ans }} etcd -o json"
+  changed_when: false
+  register: asb_pvc_out
+
+- name: Ansible Service Broker - set etcd pvc fact
+  set_fact:
+    asb_pvc_ok: "{{ tmp.status.phase != 'Pending' or 'storageClassName' in tmp.spec }}"
+  run_once: true
+  connection: local
+  vars:
+    tmp: "{{ asb_pvc_out.stdout | from_json }}"
+
+- name: Ansible Service Broker - export the etcd PVC
+  run_once: true
+  connection: local
+  register: asb_export
+  when: not asb_pvc_ok
+  command: "/usr/bin/oc export pvc -n {{ ans }} etcd -o json"
+
+- name: Ansible Service Broker - delete the etcd PVC
+  run_once: true
+  connection: local
+  register: asb_copy
+  when: not asb_pvc_ok
+  command: "/usr/bin/oc delete pvc -n {{ ans }} etcd"
+
+- name: Ansible Service Broker - recreate the etcd PVC
+  run_once: true
+  connection: local
+  when: not asb_pvc_ok
+  script: "/usr/bin/oc create -n {{ ans }} -f - <<< '{{asb_export.stdout}}'"
+
+- name: Ansible Service Broker - check if ASB deployment has stopped
+  run_once: true
+  connection: local
+  register: asb_error
+  command: "/usr/bin//oc get pod -n {{ ans }} -l deploymentconfig={{item}}"
+  changed_when: "'No resources found.' in asb_error.stderr_lines"
+  with_items:
+    - asb
+    - asb-etcd
+
+- name: Ansible Service Broker - restart ASB deployments if they stopped
+  run_once: true
+  connection: local
+  when: item is changed
+  command: "/usr/bin//oc rollout latest -n {{ ans }} dc/{{item.item}}"
+  with_items: "{{ asb_error.results }}"
+  loop_control:
+    label: "/usr/bin//oc rollout latest -n {{ ans }} dc/{{item.item}}"
+
+- name: Ansible Service Broker - clean up Error pods if they exist
+  run_once: true
+  connection: local
+  register: asb_clean
+  script: |
+    /usr/bin//oc get -n {{ ans }} pod | grep '\bError\b' | cut -d ' ' -f 1 | xargs /usr/bin/oc delete -n {{ ans }} pod
+  failed_when: asb_clean.rc != 0 and 'but no name' not in asb_clean.stderr
+  changed_when: asb_clean.rc == 0

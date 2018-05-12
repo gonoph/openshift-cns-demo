@@ -1,0 +1,12 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+- name: get nodeSelector of template service broker
+  command: oc get clusterservicebroker template-service-broker -o json
+  register: oc_out
+  changed_when: false
+  listen: force relist service templates
+
+- name: increment the relistRequests for the template service broker
+  command: |-
+    oc patch clusterservicebroker template-service-broker -p '{"spec": {"relistRequests":  {{ (oc_out.stdout | from_json).spec.relistRequests | int + 1 }} }}'
+  listen: force relist service templates

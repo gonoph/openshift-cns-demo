@@ -1,0 +1,19 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- include_tasks: ocp_local_login.yml
+  tags: [ postconfig, post_local_login ]
+
+- include_tasks: ocp_rmt_login.yml
+  tags: [ postconfig, post_rmt_login ]
+
+- include_tasks: gluster.yml
+  tags: [ postconfig, post_gluster ]
+
+- include_tasks: asb_cleanup.yml
+  tags: [ postconfig, post_asb ]
+
+- include_tasks: demos_templates.yml
+  tags: [ postconfig, post_demos ]
+
+- meta: flush_handlers
