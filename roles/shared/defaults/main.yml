@@ -2,3 +2,7 @@
 ---
 ec2_drive_map: "{{ default_ec2_drive_map }}"
 ec2_volumes: "{{ default_ec2_volumes }}"
+# if you change this, you should change the inventory htpasswd hashes
+passwords:
+  demo: demouser123
+  admin: adminuser123
