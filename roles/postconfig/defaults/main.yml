@@ -1,0 +1,16 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+ansible_service_broker_namespace: openshift-ansible-service-broker
+template_service_broker_namespace: openshift-template-service-broker
+default_openshift_storage_glusterfs_namespace: glusterfs
+default_openshift_storage_glusterfs_name: storage
+storage_class_patch: '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "true"} } }'
+
+demo_projects:
+  - name: devinfra
+    owner: demo
+  - name: demos
+    owner: demo
+
+demo_project_not_changed: "error: project {{ item.name }} already exists"
+demo_template_not_changed: "Error from server (AlreadyExists): error when creating "

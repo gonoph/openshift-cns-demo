@@ -1,0 +1,33 @@
+# vim: ts=2 sw=2 expandtab ai
+---
+
+- name: Demo Templates - Creating demo user projects
+  run_once: true
+  connection: local
+  command: "oc adm new-project {{ item.name }} --admin={{ item.owner }}"
+  with_items: "{{ demo_projects }}"
+  register: oc_out
+  changed_when: oc_out.rc == 0
+  failed_when: oc_out.rc != 0 and demo_project_not_changed in oc_out.stdout_lines
+
+- name: Demo Templates - Installing pipcache demo templates
+  run_once: true
+  connection: local
+  command: "oc create -n openshift -f {{ demos.pipcache.path }}/{{ item }}"
+  with_items: "{{ demos.pipcache.templates }}"
+  register: oc_out
+  changed_when: oc_out.rc == 0
+  failed_when: oc_out.rc != 0 and demo_template_not_changed not in oc_out.stderr
+  notify: force relist service templates
+
+- name: Demo Templates - Installing storage demo templates
+  run_once: true
+  connection: local
+  shell: |-
+    cat {{ demos.storage.path }}/{{ item }} | sed 's%//pipcache\.infra\.%//pipcache.devinfra.%' |
+      oc create -n openshift -f -
+  with_items: "{{ demos.storage.templates }}"
+  register: oc_out
+  changed_when: oc_out.rc == 0
+  failed_when: oc_out.rc != 0 and demo_template_not_changed not in oc_out.stderr
+  notify: force relist service templates
