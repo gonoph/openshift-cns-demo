@@ -8,7 +8,7 @@ rhel_extras_repo=rhui-REGION-rhel-server-extras
 ocp_domain="{{ hostvars[groups.dns | first ].public_ip }}.nip.io"
 ocp_app_domain="apps.{{ ocp_domain }}"
 ocp_hostname="ocp.{{ ocp_domain }}"
-hostname="{{ inventory_hostname }}.{{public_ip}}.nip.io"
+hostname="{{ inventory_hostname }}.example.com"
 
 openshift_release=3.7
 openshift_image_tag=v3.7.2
