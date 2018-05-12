@@ -34,11 +34,12 @@ help:
 	@echo "   post:     post configure OCP with some sane values"
 	@echo "   test:     test that Storage is working"
 	@echo "   myip:     helper target to add your current IP to the AWS VPC"
+	@echo "   info:     helper target to get URL info"
 
 all: create config ocp post test
 
 clean create myip: INVENTORY_FILE=$(EC2_INVENTORY)
-config ocp post test: INVENTORY_FILE=$(OCP_INVENTORY)
+config ocp post test info: INVENTORY_FILE=$(OCP_INVENTORY)
 
 clean: $(PLAYBOOK_CLEAN)
 	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) $<
@@ -51,6 +52,8 @@ test: post
 	$(DEBUG) ./$(SCRIPT_TEST) test
 myip:
 	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) create.yml --tags=ec2_network,untagged
+info:
+	$(DEBUG) ansible-playbook -i $(INVENTORY_FILE) post_config.yml --tags=post_info
 
 $(FLAG_CREATE): $(PLAYBOOK_CREATE) $(EC2_INVENTORY) Makefile $(CREATE_DEPS)
 $(FLAG_CONFIG): $(PLAYBOOK_CONFIG) $(OCP_INVENTORY) Makefile
