@@ -3,6 +3,7 @@ MAKEFILE_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 DOCKERFILE?=Dockerfile
 DOCKER_LABEL?=localhost/ocp-installer:latest
+CONTAINER_NAME?=ocp-installer
 
 MOTD=files/etc/motd
 
@@ -42,4 +43,4 @@ run: $(DOCKERFILE)
 	D_HOME=`$(SUDO) docker run --rm -i $(DOCKER_LABEL) /bin/sh -c 'echo $$HOME'`
 	test -z "$$D_HOME" && err 'Unable to determine docker container HOME directory'
 	V+=" -v $$T/.ssh:$$D_HOME/.ssh:Z"
-	$(SUDO) docker run --name=ocp-installer --rm -it $$V $(DOCKER_LABEL)
+	$(SUDO) docker run --name=$(CONTAINER_NAME) --rm -it $$V $(DOCKER_LABEL)
