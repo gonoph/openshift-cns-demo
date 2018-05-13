@@ -28,7 +28,7 @@
     region: "{{ ec2_region }}"
     filters:
       "instance-state-name": running
-      "tag:demo": ocp
+      "tag:demo": "{{ ec2_demo_tag }}"
       "tag:Name": "{{ inventory_hostname }}"
   register: ec2_instances
 
