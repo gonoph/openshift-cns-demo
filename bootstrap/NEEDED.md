@@ -22,4 +22,4 @@ make
 make run
 ```
 
-Make sure to read the `README.md` file.
+Make sure to read the [README.md](./README.md) file.
