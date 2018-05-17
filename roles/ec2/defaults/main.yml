@@ -1,6 +1,5 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
-ec2_create: false
 ec2_destroy: false
 
 ec2_api_getip_key: UoXQYn71TN8yahIOgHPgt95CjtHzcBJacrlKjhJ5

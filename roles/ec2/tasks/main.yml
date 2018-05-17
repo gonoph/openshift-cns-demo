@@ -6,7 +6,6 @@
 
 - name: lookup VPC or subnets, and define Security Group
   include_tasks: vpc_subnet_sg.yml
-  when: ec2_create
   tags: [ec2, ec2_network]
 
 - name: create or clean instances

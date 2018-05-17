@@ -54,7 +54,7 @@ make run
 ```
 Everything should work out if you use the `Makefile`.
 
-```base
+```bash
 # optional 
 ssh-add ~/.ssh/id_rsa.ansible
 # edit variables
@@ -65,38 +65,65 @@ make all
 
 # Important inventory variables
 
-1. `ansible_user` - the initial `ansible_user` for the VMs (ec2 is normally NOT root).
-2. `private_ip_start` - the start address for the hosts in the ec2 group (so we
-   can have static addresses across boots).
-3. `ec2_mynetworks` - list of networks/hosts to allow access to the demo EC2
-   VMs. The playbook will automatically include the current host upon which
-   ansible is run.
-4. `ec2_ami_image` - the EC2 ami image, currently using the RHEL 7.4 Atomic
-   image, you may need to update it.
-5. `ec2_instance_type` - the ec2 instance type, currently the dns server needs
-   t2.micro, and the OCP VMs use m4.large
-6. `ec2_vpc_id` - *optional* this is the vpc you want your instance to run.
-   If you only have **ONE** VPC in your AWS region, then you can leave this
-   blank. Otherwise, you will need to define this.
-7. `ec2_vpc_subnet` - *optional* playbook will select the **FIRST** subnet it
-   finds in the VPC, unless you define it here.
-6. `storage_routes` - This is used to add entries to the hosts file. It's most
-   useful without custom dns, and running in the bootstrap container.
+## Required variables
+You may or may not want to change these from what's defined in the inventory.
 
-# Explaination of playbooks
+| Variable | inventory | Description |
+| ---- | ---- | ---- |
+| ansible_user | cloud-user | EC2 instances normally don't let you run as root |
+| ec2_ami_image | RHEL 7.4 Atomic (Cloud Access) | the EC2 ami image - you may need to update it. |
+| ec2_instance_type | t2.micro/t2.medium | the ec2 instance type, currently the dns server can be t2.micro, and the OCP VMs can be m4.medium / t2.medium |
+| ec2_vpc_id | Single VPC | this is the vpc you want your instance to run. If you only have **ONE SINGLE** VPC in your AWS region, then you can leave this default. Otherwise, you will need to define this. |
+| private_ip_start | 10 | the start address for the hosts in the ec2 group (so we can have static addresses across boots) |
 
-1. `clean.yml`: playbook to clean up the EC2 instances and the local environment.
-2. `create.yml`: playbook to create all the EC2 instances for the demo. It will
-   also configure the local environment by adding the hosts to the `ssh/config`
-   and the `/etc/hosts`
-3. `config.yml`: playbook to configure the dns server and OCP instances.
-4. `ocp.yml`: playbook to read in EC2 instances and then run the OCP install playbook.
-5.  `post_config.yml`: playbook to post-configure the OCP instance by adding an
-    admin user, copying the ca.crt, and log in.
+## Optional variables
+You may want to change these defaults, but they defined to sane values in the inventory file.
 
-The inventory is in `inventory/demo` and it contains all the hosts for the
-demo, currently configured for AWS EC2 with one small dns VM, ond 3 4 core VMs
-(master + two nodes).
+| Variable | Role | Default | Description |
+| -------- | ---- | ------- | ----------- |
+| ec2_demo_tag | ec2 | ocp | The tag to apply to the EC2 instances for create, lookups, and destroy. |
+| ec2_keypair | ec2 | ansible-dev | The SSH Keypair the EC2 instances will use at creation. You must upload or create this key in EC2. I find it easier to use the same private / public key as what you're already using. |
+| ec2_mynetworks | ec2 | [ ] | list of networks/hosts to allow access to the demo EC2 VMs. The playbook will automatically include the current host upon which ansible is run. |
+| ec2_public_ip | ec2 | True | Set to false if you don't want a public IP. Though, you'll need a VPN into the VPC at that point. How to do that is beyond this demo. If you don't know what this means, I suggest keeping it at defaults. |
+| ec2_region | ec2 | us-east-1 | Which region to create the EC2 instances. |
+| ec2_vpc_subnet | ec2 | First subnet | playbook will select the **FIRST** subnet it finds in the VPC, unless you define it here. |
+| ec2_wait | ec2 | 300 | How long to wait for EC2 to finish creating the instances. |
+| demo_certificates | ec2/local | ./certificates | The directory to persist the created PKI certificates. |
+| hostname | ec2/local | {{ inventory_hostname }}.example.com | our pleasantly defined hostname |
+| local_custom_certificates | local | True | Controls the creation of the custom CA |
+| ocp_app_domain | local | apps.{{ ocp_domain }} | Domain of app domain for OCP |
+| ocp_domain | local | (nil) | Domain of public cluster URL |
+| openshift_release | local | 3.7 | Release version of OCP to install |
+
+# Explanation of playbooks
+
+| playbook | Purpose |
+| -------- | ----------- |
+| clean.yml | To clean up the EC2 instances and the local environment. |
+| create.yml | To create all the EC2 instances for the demo. It will also configure the local environment by adding the hosts to the `ssh/config` and the `/etc/hosts` |
+| config.yml | To configure the dns server and OCP instances. |
+| ocp.yml | To read in EC2 instances and then run the OCP install playbook. |
+| post_config.yml | To post-configure the OCP instance by adding an admin user, copying the ca.crt, and log in. |
+
+# Default Inventory
+
+| Host | AWS type | vCPU | Memory | Purpose |
+| ---- | -------- | ---- | ------ | ------- |
+| dns1 | t2.micro | 1 | 1GiB | dns, haproxy, certserv |
+| master1,2,3 | t2.medium | 2 | 4GiB | OCP master, CNS storage |
+| node1,2,3 | t2.medium | 2 | 4GiB | OCP node, Infrastruture |
+
+# Inventory Variables you'll probably need to change 
+
+| Variable | Why change? |
+| -------- | ----------- |
+| ec2_ami_image | You need [Red Hat Cloud Access][1] in order to see the supplied image. |
+| ansible_user | If you change the image above, you'll need to know the login user (ex: ec2-user, cloud-user) |
+| ec2_demo_tag | If you change this, then you can run multiple of these clusters in AWS at the same time. You'll have to add it to the `ec2` group in the inventory file. |
+| private_ip_start | If you change the above, then you'll need to change this variable, too, probably. |
+| ec2_instance_type | If you want beefier VMs. With the current inventory defaults, it costs me $7.50 per day as of May 17th, 2018. |
+
+[1]: https://www.redhat.com/en/technologies/cloud-computing/cloud-access
 
 # Getting Help
 
@@ -114,3 +141,4 @@ create a GitHub issue so I can address it!
 
 If you have other questions or issues with OCP or CNS in general, I'll gladly
 help you reach the correct resource at Red Hat!
+
