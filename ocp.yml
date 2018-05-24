@@ -1,5 +1,8 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
 
-- name: Install Openshift
-  import_playbook: ./openshift-ansible/playbooks/byo/config.yml
+- name: Run Prerequisites
+  import_playbook: ./openshift-ansible/playbooks/prerequisites.yml
+
+- name: Deploy Openshit Cluster
+  import_playbook: ./openshift-ansible/playbooks/deploy_cluster.yml
