@@ -6,6 +6,8 @@
   hosts: ec2
   gather_facts: false
   connection: local
+  vars:
+    ec2_create: True
   roles:
     - ec2
 
