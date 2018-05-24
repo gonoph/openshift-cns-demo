@@ -35,7 +35,7 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 openshift_master_htpasswd_users={'admin': '$apr1$slD.7Idv$RU9uQTc6xffBM8qaA4sSH/', 'demo': '$apr1$3Rp7gLp6$L6jBaTQtJ6zLuEJ85Pb9N0'}
 
 {% if local_custom_certificates %}
-openshift_master_ca_certificate={'certfile': '{{ easy_rsa_ocp_pki }}/ca-bundle.crt', 'keyfile': '{{ easy_rsa_ocp_pki }}/private/ca.key'}
+openshift_master_ca_certificate={'certfile': '{{ easy_rsa_ocp_pki | realpath }}/ca-bundle.crt', 'keyfile': '{{ easy_rsa_ocp_pki | realpath }}/private/ca.key'}
 {% endif %}
 
 {% if groups.masters | length > 1 %}
