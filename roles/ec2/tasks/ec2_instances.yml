@@ -1,7 +1,7 @@
 # vim: ts=2 sw=2 expandtab ai
 ---
 - name: create instances
-  when: not ec2_destroy
+  when: ec2_create
   ec2:
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
