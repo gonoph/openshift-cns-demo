@@ -64,8 +64,8 @@ $(CLUSTER_CA): $(MASTER_CLUSTER_CRT)
 $(CLUSTER_CA_BUNDLE): $(CLUSTER_CA) $(MASTER_CA)
 	T=`mktemp` \
 	  && trap "rm -rf $$T" EXIT \
-	  && openssl x509 -in $(CLUSTER_CA) -issuer -subject > $$T \
-	  && openssl x509 -in $(MASTER_CA) -issuer -subject >> $$T \
+	  && openssl x509 -in $(CLUSTER_CA) > $$T \
+	  && openssl x509 -in $(MASTER_CA) >> $$T \
 	  && cp $$T $@
 
 clean:
