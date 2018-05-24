@@ -59,15 +59,15 @@ openshift_service_catalog_image_version=v{{ openshift_release }}
 openshift_logging_install_logging=false
 # openshift_hosted_logging_hostname=kibana.apps.{{ ocp_domain }} 
 openshift_logging_kibana_hostname=kibana.apps.{{ ocp_domain }}
-openshift_master_logging_public_url=https://kibana.apps.{{ ocp_domain }}
-openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.{{ ocp_domain }}/hawkular/metrics
+# openshift_master_logging_public_url=https://kibana.apps.{{ ocp_domain }}
+# openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.{{ ocp_domain }}/hawkular/metrics
 # openshift_logging_kibana_proxy_debug=True
 
 ansible_service_broker_image_version=v{{ openshift_release }}
 openshift_template_service_broker_namespaces=['openshift']
 
 openshift_schedulable=True
-openshift_node_labels={'region': 'infra', 'zone': 'default'}
+openshift_node_labels={'region': 'infra', 'zone': 'default', 'node-role.kubernetes.io/compute': 'true'}
 
 openshift_storage_glusterfs_storageclass_default=True
 {% raw %}
@@ -97,7 +97,7 @@ openshift_portal_net=172.200.0.0/16
 [nodes]
 {% for node in groups.nodes %}
 {% if node in groups.masters %}
-{{ hostvars[node].hostname }} openshift_node_labels="{'region': 'master', 'zone': 'default', 'openshift-infra': 'apiserver'}" openshift_schedulable=False
+{{ hostvars[node].hostname }} openshift_node_labels="{'region': 'master', 'zone': 'default', 'openshift-infra': 'apiserver'}"
 {% else %}
 {{ hostvars[node].hostname }} internal_ip={{ hostvars[node].internal_ip }} public_ip={{ hostvars[node].ansible_host }}
 {% endif %}
