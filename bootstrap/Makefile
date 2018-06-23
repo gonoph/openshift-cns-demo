@@ -22,12 +22,13 @@ build: $(DOCKERFILE)
 
 GID=$(shell id -g)
 UID=$(shell id -u)
+USER=$(shell id -u -n)
 
 $(MOTD): Makefile
 	sed -n '/^# Usage/,/# Explaination of playbooks/p' ../README.md  | head -n -1 > files/etc/motd
 
 $(DOCKERFILE): $(DOCKERFILE).template $(MOTD) Makefile
-	sed -e "s,%%GID%%,$(GID)," -e "s,%%UID%%,$(UID)," $(DOCKERFILE).template > $(DOCKERFILE)
+	sed -e "s,%%GID%%,$(GID)," -e "s,%%UID%%,$(UID)," -e "s,%%USER%%,$(USER)," $(DOCKERFILE).template > $(DOCKERFILE)
 
 clean: $(DOCKERFILE).template
 	rm -fv $(DOCKERFILE) files/etc/motd
