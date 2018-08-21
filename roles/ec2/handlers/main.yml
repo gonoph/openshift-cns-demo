@@ -22,3 +22,12 @@
   pause:
     seconds: 15
   listen: Wait for SSH to come up
+
+- name: ping hosts again
+  ping:
+  register: ping
+  until: ping is success
+  retries: 20
+  delay: 1
+  ignore_errors: no
+  listen: Wait for SSH to come up
