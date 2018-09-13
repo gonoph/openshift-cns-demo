@@ -1,7 +1,7 @@
 [submodule "openshift-ansible"]
 	path = openshift-ansible
 	url = https://github.com/openshift/openshift-ansible.git
-	branch = openshift-ansible-3.7.44-1
+	branch = release-3.7
 [submodule "easy-rsa"]
 	path = easy-rsa
 	url = https://github.com/OpenVPN/easy-rsa
