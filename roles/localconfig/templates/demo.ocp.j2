@@ -79,14 +79,20 @@ openshift_public_ip={{ public_ip }}
 # openshift_dns_ip=172.200.0.1
 openshift_portal_net=172.200.0.0/16
 
+[demo]
+{% for node in groups.all %}
+{% set hv=hostvars[node] %}
+{{ hv.hostname }} docker_storage_dev='{{ hv.docker_storage_dev }}' internal_ip={{ hv.internal_ip }} public_ip={{ hv.public_ip }}
+{% endfor %}
+
 [dns]
 {% for node in groups.dns %}
-{{ hostvars[node].hostname }} docker_storage_dev='' internal_ip={{ hostvars[node].internal_ip }} public_ip={{ hostvars[node].public_ip }}
+{{ hostvars[node].hostname }}
 {% endfor %}
 
 [masters]
 {% for master in groups.masters %}
-{{ hostvars[master].hostname }} internal_ip={{ hostvars[master].internal_ip }} public_ip={{ hostvars[master].ansible_host }}
+{{ hostvars[master].hostname }}
 {% endfor %}
 
 [etcd]
@@ -99,7 +105,7 @@ openshift_portal_net=172.200.0.0/16
 {% if node in groups.masters %}
 {{ hostvars[node].hostname }} openshift_node_labels="{'region': 'master', 'zone': 'default', 'openshift-infra': 'apiserver'}"
 {% else %}
-{{ hostvars[node].hostname }} internal_ip={{ hostvars[node].internal_ip }} public_ip={{ hostvars[node].ansible_host }}
+{{ hostvars[node].hostname }}
 {% endif %}
 {% endfor %}
 
