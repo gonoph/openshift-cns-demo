@@ -9,7 +9,7 @@ MOTD=files/etc/motd
 
 all: build
 
-TEST_NEEDS_SUDO:=$(shell docker ps > /dev/null 2>&1 && echo no || echo yes)
+TEST_NEEDS_SUDO:=$(shell podman ps > /dev/null 2>&1 && echo no || echo yes)
 
 ifeq ($(TEST_NEEDS_SUDO),yes)
 SUDO:=sudo
@@ -18,7 +18,7 @@ SUDO:=
 endif
 
 build: $(DOCKERFILE)
-	$(SUDO) docker build -t $(DOCKER_LABEL) -f $(DOCKERFILE) .
+	$(SUDO) podman build -t $(DOCKER_LABEL) -f $(DOCKERFILE) .
 
 GID=$(shell id -g)
 UID=$(shell id -u)
@@ -41,7 +41,7 @@ run: $(DOCKERFILE)
 	err() { echo "$$@" >&2; exit 1; }
 	V="-v $(MAKEFILE_DIR)/..:/tmp/install:Z"
 	test -r $(MAKEFILE_DIR)/aws && cp $(MAKEFILE_DIR)/aws $$T && V+=" -v $$T/aws:/etc/profile.d/aws.sh:Z"
-	D_HOME=`$(SUDO) docker run --rm -i $(DOCKER_LABEL) /bin/sh -c 'echo $$HOME'`
-	test -z "$$D_HOME" && err 'Unable to determine docker container HOME directory'
+	D_HOME=`$(SUDO) podman run --rm -i $(DOCKER_LABEL) /bin/sh -c 'echo $$HOME'`
+	test -z "$$D_HOME" && err 'Unable to determine podman container HOME directory'
 	V+=" -v $$T/.ssh:$$D_HOME/.ssh:Z"
-	$(SUDO) docker run --name=$(CONTAINER_NAME) --rm -it $$V $(DOCKER_LABEL)
+	$(SUDO) podman run --name=$(CONTAINER_NAME) --rm -it $$V $(DOCKER_LABEL)
